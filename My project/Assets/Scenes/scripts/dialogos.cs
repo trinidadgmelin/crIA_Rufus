@@ -16,15 +16,29 @@ public class dialogos : MonoBehaviour
     public Sprite[] backgroundSprites;
 
     [Header("Botones e Indicaciones Condicionales")]
-    public GameObject panelTresBotones;      // El panel que contiene los 3 botones
-    public GameObject objetoIndicaciones;    // El objeto "indicaciones" que se ocultará
-    public int indexParaMostrarBotones = 2;  // El número de la oración en la que aparecen los botones
+    public GameObject panelTresBotones;
+    public GameObject objetoIndicaciones;
+    public int indexParaMostrarBotones = 2;
 
     private int index = 0;
 
+    // ESTA VARIABLE ES LA CLAVE PARA COMUNICAR ESCENAS
+    public static bool saltarABotones = false;
+
     void Start()
     {
-        // Estado inicial al arrancar
+        // Si venimos desde la otra hitbox, saltamos directo al índice de los botones
+        if (saltarABotones)
+        {
+            index = indexParaMostrarBotones;
+            saltarABotones = false; // La apagamos para que la próxima vez inicie normal
+        }
+        else
+        {
+            index = 0; // Inicio normal
+        }
+
+        // Estado inicial de los paneles
         if (panelTresBotones != null)
         {
             panelTresBotones.SetActive(false);
