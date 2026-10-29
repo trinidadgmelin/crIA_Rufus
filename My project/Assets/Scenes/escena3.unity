@@ -288,6 +288,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   popUp: {fileID: 944999585}
+  fondoImage: {fileID: 888358053}
+  fondoHover: {fileID: 21300000, guid: df049453de789e440a0f018c809d1448, type: 3}
 --- !u!61 &277485608
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1099,6 +1101,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   popUp: {fileID: 944999585}
+  fondoImage: {fileID: 888358053}
+  fondoHover: {fileID: 21300000, guid: b4b806043f5f9164ca2a685b3a25c12e, type: 3}
 --- !u!61 &1272067231
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1645,6 +1649,8 @@ MonoBehaviour:
   mate: {fileID: 1681098347}
   rufusFeliz: {fileID: 1891867753}
   rufusMate: {fileID: 21300000, guid: 3b2f6b6b7b810b9428bddcf4a324c878, type: 3}
+  puertoSerial: COM5
+  baudRate: 9600
 --- !u!1 &1891867751
 GameObject:
   m_ObjectHideFlags: 0
