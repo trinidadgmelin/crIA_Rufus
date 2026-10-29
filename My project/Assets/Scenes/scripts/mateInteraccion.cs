@@ -33,10 +33,7 @@ public class mateInteraccion : MonoBehaviour, IPointerClickHandler
     void Update()
     {
         // 1. Detección por teclado (B o M + Flecha Derecha)
-        bool activarPorTeclado = Input.GetKeyDown(KeyCode.B) ||
-                                 (Input.GetKey(KeyCode.M) && Input.GetKeyDown(KeyCode.RightArrow)) ||
-                                 (Input.GetKey(KeyCode.RightArrow) && Input.GetKeyDown(KeyCode.M)) ||
-                                 (Input.GetKeyDown(KeyCode.M) && Input.GetKeyDown(KeyCode.RightArrow));
+        bool activarPorTeclado = Input.GetKeyDown(KeyCode.B);
 
         bool activarPorSensor = false;
 

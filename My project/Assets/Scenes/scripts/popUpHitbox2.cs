@@ -1,7 +1,7 @@
 
 using UnityEngine;
 
-public class popUpHitbox : MonoBehaviour
+public class popUpHitbox2 : MonoBehaviour
 {
     [Header("UI del Pop-up")]
     public GameObject popUp;
