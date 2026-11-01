@@ -61,6 +61,7 @@ public class dialogos : MonoBehaviour
 
     void NextSentence()
     {
+        // Si todavía quedan oraciones por delante, avanzamos
         if (index < sentences.Length - 1)
         {
             index++;
@@ -68,8 +69,13 @@ public class dialogos : MonoBehaviour
         }
         else
         {
-            Debug.Log("Diálogo finalizado. Cambiando de escena...");
-            SceneManager.LoadScene("escena3");
+            // CAMBIO: Ahora, en vez de cargar otra escena, simplemente avisa por consola 
+            // o no hace nada, evitando que el juego cambie de escena con la tecla A.
+            Debug.Log("Llegaste al final de los diálogos.");
+
+            // Si querés que al llegar al final pase algo (por ejemplo, ocultar el cuadro de diálogo), 
+            // podés descomentar la siguiente línea:
+            // if (fondoDialogo != null) fondoDialogo.SetActive(false);
         }
     }
 
@@ -92,13 +98,13 @@ public class dialogos : MonoBehaviour
             // 3. Controla los botones y las indicaciones según la oración actual
             if (index == indexParaMostrarBotones)
             {
-                if (panelTresBotones != null) panelTresBotones.SetActive(true);     // Muestra los botones
+                if (panelTresBotones != null) panelTresBotones.SetActive(true);      // Muestra los botones
                 if (objetoIndicaciones != null) objetoIndicaciones.SetActive(false); // Oculta "indicaciones"
             }
             else
             {
                 if (panelTresBotones != null) panelTresBotones.SetActive(false);    // Oculta los botones
-                if (objetoIndicaciones != null) objetoIndicaciones.SetActive(true);  // Muestra "indicaciones" en el resto
+                if (objetoIndicaciones != null) objetoIndicaciones.SetActive(true);   // Muestra "indicaciones" en el resto
             }
         }
     }

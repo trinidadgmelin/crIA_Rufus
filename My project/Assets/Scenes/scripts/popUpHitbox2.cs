@@ -7,7 +7,7 @@ public class popUpHitbox2 : MonoBehaviour
     public GameObject popUp;
 
     [Header("Configuración de Fondo por Hover")]
-    public Image fondoImage;          // Arrastrá acá el objeto Image del fondo desde el Inspector
+    public SpriteRenderer fondoNido;          // Arrastrá acá el objeto Image del fondo desde el Inspector
     public Sprite fondoHover;         // El sprite que querés mostrar cuando pasas el mouse por encima
     private Sprite fondoOriginal;     // Guarda el fondo original para restaurarlo al salir
 
@@ -27,9 +27,9 @@ public class popUpHitbox2 : MonoBehaviour
         }
 
         // Guardamos automáticamente el sprite que tiene el fondo al empezar
-        if (fondoImage != null)
+        if (fondoNido != null)
         {
-            fondoOriginal = fondoImage.sprite;
+            fondoOriginal = fondoNido.sprite;
         }
         else
         {
@@ -64,18 +64,18 @@ public class popUpHitbox2 : MonoBehaviour
     // Se ejecuta automáticamente cuando el mouse ENTRA en el Collider 2D
     private void OnMouseEnter()
     {
-        if (fondoImage != null && fondoHover != null)
+        if (fondoNido != null && fondoHover != null)
         {
-            fondoImage.sprite = fondoHover;
+            fondoNido.sprite = fondoHover;
         }
     }
 
     // Se ejecuta automáticamente cuando el mouse SALE del Collider 2D
     private void OnMouseExit()
     {
-        if (fondoImage != null && fondoOriginal != null)
+        if (fondoNido != null && fondoOriginal != null)
         {
-            fondoImage.sprite = fondoOriginal;
+            fondoNido.sprite = fondoOriginal;
         }
     }
 }

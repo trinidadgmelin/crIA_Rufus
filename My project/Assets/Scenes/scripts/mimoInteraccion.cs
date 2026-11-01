@@ -1,26 +1,29 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using System.IO.Ports;
 
 public class mimoInteraccion : MonoBehaviour
 {
     [Header("Referencias UI / Personaje")]
-    public Image rufusFeliz;          // El componente Image de Rufus
-    public Sprite rufusMimo;          // El nuevo sprite que tendrá Rufus al llenarse la barra
-    public Slider barraProgreso;      // Arrastrá acá tu Slider de la UI
+    public SpriteRenderer rufusFeliz;
+    public Sprite rufusMimo;
+    public Slider barraProgreso;
+
+    [Header("Configuración de Tiempo")]
+    public float segundosVisible = 3f;
 
     [Header("Configuración Arduino (Ultrasónico)")]
     public string puertoSerial = "COM5";
     public int baudRate = 9600;
     private SerialPort stream;
 
-    private float progresoActual = 0f; // Lleva la cuenta (va de 0.0 a 1.0)
+    private float progresoActual = 0f;
     private float tiempoUltimoAumento = 0f;
-    private float cooldownAumento = 0.8f; // Tiempo mínimo entre cada aumento automático por sensor
+    private float cooldownAumento = 0.8f;
 
     void Start()
     {
-        // Configuramos la barra para que empiece vacía (0) y su máximo sea 1
         if (barraProgreso != null)
         {
             barraProgreso.minValue = 0f;
@@ -28,28 +31,20 @@ public class mimoInteraccion : MonoBehaviour
             barraProgreso.value = 0f;
         }
 
-        // Inicializamos el puerto serie para escuchar al Arduino
         try
         {
             stream = new SerialPort(puertoSerial, baudRate);
             stream.ReadTimeout = 50;
             stream.Open();
-            Debug.Log("Puerto serie abierto correctamente en " + puertoSerial);
         }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning("No se pudo abrir el puerto serie: " + e.Message);
-        }
+        catch (System.Exception e) { }
     }
 
     void Update()
     {
-        // 1. Detección por teclado (Tecla B)
         bool activarPorTeclado = Input.GetKeyDown(KeyCode.B);
-
         bool activarPorSensor = false;
 
-        // 2. Detección por Puerto Serie (Arduino - Sensor Ultrasónico)
         if (stream != null && stream.IsOpen)
         {
             try
@@ -57,24 +52,15 @@ public class mimoInteraccion : MonoBehaviour
                 if (stream.BytesToRead > 0)
                 {
                     string dato = stream.ReadLine().Trim();
-
-                    // Esto te muestra en la consola exactamente qué está llegando desde el Arduino
-                    Debug.Log("Arduino dice: [" + dato + "]");
-
-                    // Condición flexible: detecta si el texto contiene "Mano" o "cerca"
                     if (dato.Contains("Mano") || dato.Contains("cerca"))
                     {
                         activarPorSensor = true;
                     }
                 }
             }
-            catch (System.Exception)
-            {
-                // Ignoramos excepciones de timeout
-            }
+            catch (System.Exception) { }
         }
 
-        // Aumenta si presionas 'B' O si el sensor detecta la mano (respetando el cooldown)
         if (activarPorTeclado || (activarPorSensor && Time.time - tiempoUltimoAumento > cooldownAumento))
         {
             AumentarProgreso();
@@ -83,11 +69,7 @@ public class mimoInteraccion : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        if (stream != null && stream.IsOpen)
-        {
-            stream.Close();
-            Debug.Log("Puerto serie cerrado.");
-        }
+        if (stream != null && stream.IsOpen) stream.Close();
     }
 
     void AumentarProgreso()
@@ -97,12 +79,7 @@ public class mimoInteraccion : MonoBehaviour
         tiempoUltimoAumento = Time.time;
         progresoActual += 0.25f;
 
-        if (barraProgreso != null)
-        {
-            barraProgreso.value = progresoActual;
-        }
-
-        Debug.Log("Progreso de la barra: " + (progresoActual * 100) + "%");
+        if (barraProgreso != null) barraProgreso.value = progresoActual;
 
         if (progresoActual >= 1f)
         {
@@ -112,11 +89,27 @@ public class mimoInteraccion : MonoBehaviour
 
     void EjecutarAccionFinal()
     {
-        if (rufusFeliz != null && rufusMimo != null)
+        necesidadesUI ui = FindObjectOfType<necesidadesUI>();
+        if (ui != null && rufusMimo != null)
         {
-            rufusFeliz.sprite = rufusMimo;
+            ui.MostrarSpriteTemporal(rufusMimo, segundosVisible);
         }
 
-        Debug.Log("¡Acción completada: barra llena y sprite de Rufus cambiado a Mimo!");
+        // Reiniciar timer de Caricias
+        if (timerNecesidades.Instance != null)
+        {
+            timerNecesidades.Instance.quiereCaricias = false;
+            timerNecesidades.Instance.caricias.timerActual = timerNecesidades.Instance.caricias.intervalo;
+            timerNecesidades.Instance.caricias.estaCorriendo = false;
+        }
+
+        StartCoroutine(ResetearBarra());
+    }
+
+    IEnumerator ResetearBarra()
+    {
+        yield return new WaitForSeconds(segundosVisible);
+        progresoActual = 0f;
+        if (barraProgreso != null) barraProgreso.value = 0f;
     }
 }

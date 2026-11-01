@@ -1,17 +1,21 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Collections;
 using System.IO.Ports;
 
 public class mateInteraccion : MonoBehaviour, IPointerClickHandler
 {
     [Header("Referencias")]
-    public GameObject mate;
-    public Image rufusFeliz;
+    public GameObject mate; // El objeto del mate
+    public SpriteRenderer rufusFeliz;
     public Sprite rufusMate;
 
+    [Header("Configuración de Tiempo")]
+    public float segundosVisible = 3f;
+
     [Header("Configuración Arduino")]
-    public string puertoSerial = "COM5"; // Cambiá esto si tu puerto es otro (ej. COM4)
+    public string puertoSerial = "COM5";
     public int baudRate = 9600;
     private SerialPort stream;
 
@@ -22,48 +26,31 @@ public class mateInteraccion : MonoBehaviour, IPointerClickHandler
             stream = new SerialPort(puertoSerial, baudRate);
             stream.ReadTimeout = 50;
             stream.Open();
-            Debug.Log("Puerto serie abierto correctamente en " + puertoSerial);
         }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning("No se pudo abrir el puerto serie: " + e.Message);
-        }
+        catch (System.Exception e) { }
     }
 
     void Update()
     {
-        // 1. Detección por teclado (B o M + Flecha Derecha)
         bool activarPorTeclado = Input.GetKeyDown(KeyCode.B);
-
         bool activarPorSensor = false;
 
-        // 2. Detección por Puerto Serie (Arduino)
         if (stream != null && stream.IsOpen)
         {
             try
             {
-                // Solo leemos si hay bytes esperando en el búfer
                 if (stream.BytesToRead > 0)
                 {
                     string dato = stream.ReadLine().Trim();
-
-                    // ¡Esto te mostrará en la consola lo que manda Arduino!
-                    Debug.Log("Arduino dice: " + dato);
-
-                    // Detecta cualquier mensaje del Arduino que contenga la palabra PRESIONADO o Pin 2
                     if (dato.Contains("PRESIONADO") || dato.Contains("Pin 2"))
                     {
                         activarPorSensor = true;
                     }
                 }
             }
-            catch (System.Exception)
-            {
-                // Ignoramos excepciones de timeout para que el juego no se trabe
-            }
+            catch (System.Exception) { }
         }
 
-        // Si se cumple alguna de las opciones, ejecutamos
         if (activarPorTeclado || activarPorSensor)
         {
             EjecutarAccion();
@@ -72,11 +59,7 @@ public class mateInteraccion : MonoBehaviour, IPointerClickHandler
 
     void OnApplicationQuit()
     {
-        if (stream != null && stream.IsOpen)
-        {
-            stream.Close();
-            Debug.Log("Puerto serie cerrado.");
-        }
+        if (stream != null && stream.IsOpen) stream.Close();
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -86,16 +69,39 @@ public class mateInteraccion : MonoBehaviour, IPointerClickHandler
 
     void EjecutarAccion()
     {
+        // 1. Desactivar el objeto del mate para que desaparezca visualmente
         if (mate != null)
         {
             mate.SetActive(false);
         }
 
-        if (rufusFeliz != null && rufusMate != null)
+        // 2. Mostrar el sprite temporal de Rufus tomando mate a través de la UI 
+        // (Esto automáticamente oculta los carteles de advertencia para que no estorben)
+        necesidadesUI ui = FindObjectOfType<necesidadesUI>();
+        if (ui != null && rufusMate != null)
         {
-            rufusFeliz.sprite = rufusMate;
+            ui.MostrarSpriteTemporal(rufusMate, segundosVisible);
         }
 
-        Debug.Log("¡Acción realizada: el mate desapareció y el pájaro ahora toma mate!");
+        // 3. Reiniciar el timer de Hambre
+        if (timerNecesidades.Instance != null)
+        {
+            timerNecesidades.Instance.tieneHambre = false;
+            timerNecesidades.Instance.hambre.timerActual = timerNecesidades.Instance.hambre.intervalo;
+            timerNecesidades.Instance.hambre.estaCorriendo = false;
+        }
+
+        StartCoroutine(RestaurarMate());
+    }
+
+    IEnumerator RestaurarMate()
+    {
+        yield return new WaitForSeconds(segundosVisible);
+
+        // 4. Vuelve a aparecer el mate pasado el tiempo
+        if (mate != null)
+        {
+            mate.SetActive(true);
+        }
     }
 }

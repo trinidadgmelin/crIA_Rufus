@@ -1,45 +1,48 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Collections;
 using System.IO.Ports;
 
 public class nidoInteraccion : MonoBehaviour, IPointerClickHandler
 {
     [Header("Referencias")]
-    public Image rufusFeliz; // El objeto de Rufus que se va a eliminar
+    public GameObject objetoRufus;      // El GameObject de Rufus que se oculta al dormir
 
     [Header("Configuración del Fondo")]
-    public Image fondoImage;         // Componente Image del fondo
-    public Sprite nuevoFondoSprite;  // Nuevo sprite para el fondo
+    public SpriteRenderer fondoImage;
+    public Sprite nuevoFondoSprite;     // El fondo que ya tiene a Rufus durmiendo dibujado
+    private Sprite fondoOriginalSprite;
+
+    [Header("Advertencia")]
+    public GameObject sueñoAd;          // El cartel de advertencia de dormir
+
+    [Header("Configuración de Tiempo")]
+    public float segundosVisible = 3f;
 
     [Header("Configuración Arduino")]
-    public string puertoSerial = "COM5"; // Asegurate que coincida con tu puerto
+    public string puertoSerial = "COM5";
     public int baudRate = 9600;
     private SerialPort stream;
 
     void Start()
     {
+        if (fondoImage != null) fondoOriginalSprite = fondoImage.sprite;
+
         try
         {
             stream = new SerialPort(puertoSerial, baudRate);
             stream.ReadTimeout = 50;
             stream.Open();
-            Debug.Log("Puerto serie abierto correctamente en " + puertoSerial);
         }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning("No se pudo abrir el puerto serie: " + e.Message);
-        }
+        catch (System.Exception e) { }
     }
 
     void Update()
     {
-        // 1. Detección por teclado (Tecla B)
         bool activarPorTeclado = Input.GetKeyDown(KeyCode.B);
-
         bool activarPorSensor = false;
 
-        // 2. Detección por Puerto Serie (Arduino - Pin 3)
         if (stream != null && stream.IsOpen)
         {
             try
@@ -47,23 +50,15 @@ public class nidoInteraccion : MonoBehaviour, IPointerClickHandler
                 if (stream.BytesToRead > 0)
                 {
                     string dato = stream.ReadLine().Trim();
-
-                    Debug.Log("Arduino dice: " + dato);
-
-                    // Detecta el mensaje específico del Pin 3 cuando se presiona
                     if (dato.Contains("PRESIONADO") && dato.Contains("Pin 3"))
                     {
                         activarPorSensor = true;
                     }
                 }
             }
-            catch (System.Exception)
-            {
-                // Ignoramos excepciones de timeout para que el juego no se trabe
-            }
+            catch (System.Exception) { }
         }
 
-        // Si se presiona la tecla B o se activa el sensor del Pin 3, ejecutamos
         if (activarPorTeclado || activarPorSensor)
         {
             EjecutarAccion();
@@ -72,11 +67,7 @@ public class nidoInteraccion : MonoBehaviour, IPointerClickHandler
 
     void OnApplicationQuit()
     {
-        if (stream != null && stream.IsOpen)
-        {
-            stream.Close();
-            Debug.Log("Puerto serie cerrado.");
-        }
+        if (stream != null && stream.IsOpen) stream.Close();
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -86,18 +77,48 @@ public class nidoInteraccion : MonoBehaviour, IPointerClickHandler
 
     void EjecutarAccion()
     {
-        // Elimina por completo el objeto de Rufus de la escena
-        if (rufusFeliz != null)
+        // 1. Ocultar el objeto de Rufus para que solo se vea el del fondo nuevo
+        if (objetoRufus != null)
         {
-            Destroy(rufusFeliz.gameObject);
+            objetoRufus.SetActive(false);
         }
 
-        // Cambia el sprite del fondo de la UI
+        // 2. Apagar el cartel de advertencia al interactuar
+        if (sueñoAd != null)
+        {
+            sueñoAd.SetActive(false);
+        }
+
+        // 3. Cambiar al fondo nuevo (que tiene a Rufus durmiendo)
         if (fondoImage != null && nuevoFondoSprite != null)
         {
             fondoImage.sprite = nuevoFondoSprite;
         }
 
-        Debug.Log("¡Acción realizada: Rufus fue eliminado y se cambió el fondo!");
+        // 4. Reiniciar timer de Dormir
+        if (timerNecesidades.Instance != null)
+        {
+            timerNecesidades.Instance.quiereDormir = false;
+            timerNecesidades.Instance.dormir.timerActual = timerNecesidades.Instance.dormir.intervalo;
+            timerNecesidades.Instance.dormir.estaCorriendo = false;
+        }
+
+        StartCoroutine(RestaurarEstado());
+    }
+
+    IEnumerator RestaurarEstado()
+    {
+        yield return new WaitForSeconds(segundosVisible);
+
+        // 5. Volver a mostrar el objeto de Rufus y restaurar el fondo original
+        if (objetoRufus != null)
+        {
+            objetoRufus.SetActive(true);
+        }
+
+        if (fondoImage != null && fondoOriginalSprite != null)
+        {
+            fondoImage.sprite = fondoOriginalSprite;
+        }
     }
 }
