@@ -156,7 +156,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -26, y: 283}
+  m_AnchoredPosition: {x: -38, y: 391}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &114172429
@@ -182,8 +182,8 @@ MonoBehaviour:
   m_text: "El Q-learning calcula qu\xE9 tan conveniente es realizar una acci\xF3n
     en una situaci\xF3n determinada."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2fbd43e2f416c6b408639cc92ebd1224, type: 2}
+  m_sharedMaterial: {fileID: -6162986220822658112, guid: 2fbd43e2f416c6b408639cc92ebd1224, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -207,8 +207,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -572,7 +572,7 @@ GameObject:
   m_Component:
   - component: {fileID: 740162840}
   - component: {fileID: 740162839}
-  - component: {fileID: 740162838}
+  - component: {fileID: 740162841}
   m_Layer: 0
   m_Name: hitboxPoster2
   m_TagString: Untagged
@@ -580,21 +580,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &740162838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 740162837}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe46f1e6797fd364ebdb34064a207dbc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  popUp: {fileID: 944999585}
-  fondoNido: {fileID: 736078193}
-  fondoHover: {fileID: 21300000, guid: 1e3ec06fb22efee4bb20a605e9092df4, type: 3}
 --- !u!61 &740162839
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -655,99 +640,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &833830130
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 833830133}
-  - component: {fileID: 833830132}
-  - component: {fileID: 833830131}
-  m_Layer: 0
-  m_Name: hitboxPeluche
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &833830131
+--- !u!114 &740162841
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 833830130}
+  m_GameObject: {fileID: 740162837}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe46f1e6797fd364ebdb34064a207dbc, type: 3}
+  m_Script: {fileID: 11500000, guid: 926443754f978384c82eb656ff88cef8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   popUp: {fileID: 944999585}
+  textoUnico: {fileID: 114172429}
+  imagenUnica: {fileID: 1580828284}
+  pasosDeEsteHitbox:
+  - textoPaso: "Antes, las mascotas respond\xEDan siempre de la misma manera y premiaban
+      la repetici\xF3n de cuidados. Actualmente, la IA utiliza memoria epis\xF3dica
+      y aprendizaje para recordar las interacciones y desarrollar una personalidad
+      \xFAnica, construyendo un v\xEDnculo afectivo personalizado con el usuario."
+    imagenPaso: {fileID: 21300000, guid: fb4e568d2449b1946aa0c3c30a7559a8, type: 3}
   fondoNido: {fileID: 736078193}
-  fondoHover: {fileID: 21300000, guid: c041cfbabd980944b83467a49326a7fe, type: 3}
---- !u!61 &833830132
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 833830130}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.75, y: 2}
-  m_EdgeRadius: 0
---- !u!4 &833830133
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 833830130}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -614, y: -342, z: 0}
-  m_LocalScale: {x: 85.620125, y: 96.68978, z: 100}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  fondoHover: {fileID: 21300000, guid: 1e3ec06fb22efee4bb20a605e9092df4, type: 3}
 --- !u!1 &839296499
 GameObject:
   m_ObjectHideFlags: 0
@@ -849,7 +764,7 @@ GameObject:
   m_Component:
   - component: {fileID: 892518706}
   - component: {fileID: 892518705}
-  - component: {fileID: 892518704}
+  - component: {fileID: 892518707}
   m_Layer: 0
   m_Name: hitboxLampara
   m_TagString: Untagged
@@ -857,21 +772,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &892518704
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 892518703}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe46f1e6797fd364ebdb34064a207dbc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  popUp: {fileID: 944999585}
-  fondoNido: {fileID: 736078193}
-  fondoHover: {fileID: 21300000, guid: 831e06e646e473745a815dcd6b73a2fb, type: 3}
 --- !u!61 &892518705
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -932,142 +832,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &914220277
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 914220278}
-  - component: {fileID: 914220280}
-  - component: {fileID: 914220279}
-  m_Layer: 5
-  m_Name: infoTexto2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &914220278
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 914220277}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 944999586}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -26, y: -302}
-  m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &914220279
+--- !u!114 &892518707
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 914220277}
+  m_GameObject: {fileID: 892518703}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: 926443754f978384c82eb656ff88cef8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: Con la experiencia, construye una tabla o modelo de valores y elige las
-    acciones que espera que proporcionen mayores recompensas. Asi, se ajusta gradualmente
-    la estrategia de comportamiento de un agente.
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 1
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: -662.6968, y: 0, z: -678.6653, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!222 &914220280
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 914220277}
-  m_CullTransparentMesh: 1
+  popUp: {fileID: 944999585}
+  textoUnico: {fileID: 114172429}
+  imagenUnica: {fileID: 1580828284}
+  pasosDeEsteHitbox:
+  - textoPaso: "Antes, las acciones activaban animaciones predeterminadas, sin considerar
+      el contexto emocional o f\xEDsico del personaje. Actualmente, la IA combina
+      animaciones mediante una matriz psicol\xF3gica y t\xE9cnicas procedurales,
+      adaptando sus movimientos al entorno y su estado. Un ejemplo es Trico, de The
+      Last Guardian, que utiliza Inverse Kinematics para adaptar sus movimientos
+      al terreno."
+    imagenPaso: {fileID: 21300000, guid: 8380a4c1afe946748bc1b9d1b58b1efa, type: 3}
+  fondoNido: {fileID: 736078193}
+  fondoHover: {fileID: 21300000, guid: 831e06e646e473745a815dcd6b73a2fb, type: 3}
 --- !u!1 &944999585
 GameObject:
   m_ObjectHideFlags: 0
@@ -1083,7 +872,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &944999586
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1099,9 +888,7 @@ RectTransform:
   - {fileID: 1634757496}
   - {fileID: 1285592961}
   - {fileID: 114172428}
-  - {fileID: 914220278}
   - {fileID: 1580828283}
-  - {fileID: 1320834971}
   m_Father: {fileID: 1928616317}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1362,7 +1149,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1197686525}
   - component: {fileID: 1197686524}
-  - component: {fileID: 1197686523}
+  - component: {fileID: 1197686526}
   m_Layer: 0
   m_Name: hitboxLibros
   m_TagString: Untagged
@@ -1370,21 +1157,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1197686523
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1197686522}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe46f1e6797fd364ebdb34064a207dbc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  popUp: {fileID: 944999585}
-  fondoNido: {fileID: 736078193}
-  fondoHover: {fileID: 21300000, guid: da9e5ee88b2ccca4fab45660f42493d3, type: 3}
 --- !u!61 &1197686524
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1445,6 +1217,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1197686526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197686522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 926443754f978384c82eb656ff88cef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  popUp: {fileID: 944999585}
+  textoUnico: {fileID: 114172429}
+  imagenUnica: {fileID: 1580828284}
+  pasosDeEsteHitbox:
+  - textoPaso: "Antes, las necesidades de las mascotas funcionaban con temporizadores
+      y valores que disminu\xEDan de forma predecible. Actualmente, la IA gestiona
+      necesidades interconectadas, analiza el contexto y adapta sus requerimientos
+      al estilo de vida y los cuidados que recibe."
+    imagenPaso: {fileID: 21300000, guid: dc5c9f1a98f4195468d2e53c654588bc, type: 3}
+  fondoNido: {fileID: 736078193}
+  fondoHover: {fileID: 21300000, guid: da9e5ee88b2ccca4fab45660f42493d3, type: 3}
 --- !u!1 &1231303681
 GameObject:
   m_ObjectHideFlags: 0
@@ -1652,81 +1447,6 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1285592960}
-  m_CullTransparentMesh: 1
---- !u!1 &1320834970
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1320834971}
-  - component: {fileID: 1320834973}
-  - component: {fileID: 1320834972}
-  m_Layer: 5
-  m_Name: info2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1320834971
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1320834970}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 4}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 944999586}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 342, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1320834972
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1320834970}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a9797f839f660bf47bfe32c27087c758, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1320834973
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1320834970}
   m_CullTransparentMesh: 1
 --- !u!1 &1340129845
 GameObject:
@@ -1941,14 +1661,14 @@ RectTransform:
   m_GameObject: {fileID: 1580828282}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_LocalScale: {x: 8, y: 4, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 944999586}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -262, y: 0}
+  m_AnchoredPosition: {x: 0, y: -158}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1580828284
@@ -2236,8 +1956,8 @@ RectTransform:
   - {fileID: 1806982747}
   - {fileID: 380198778}
   - {fileID: 1231303682}
-  - {fileID: 944999586}
   - {fileID: 1340129846}
+  - {fileID: 944999586}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2398,7 +2118,6 @@ SceneRoots:
   - {fileID: 1197686525}
   - {fileID: 740162840}
   - {fileID: 892518706}
-  - {fileID: 833830133}
   - {fileID: 839296501}
   - {fileID: 736078194}
   - {fileID: 2051165456}

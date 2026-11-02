@@ -6,6 +6,10 @@ public class necesidadesUI : MonoBehaviour
 {
     public static necesidadesUI Instance;
 
+    // Propiedad pública que indica si la UI está bloqueada (mostrando sprite temporal)
+    public bool EstaBloqueado { get; private set; } = false;
+
+    // ... (el resto de tu código)
     [Header("Sprite por Defecto de Rufus")]
     public SpriteRenderer rufusSpriteRenderer;
     public Sprite spriteNormal;
