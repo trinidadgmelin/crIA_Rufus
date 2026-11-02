@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class timerNecesidades : MonoBehaviour
 {
@@ -15,15 +16,16 @@ public class timerNecesidades : MonoBehaviour
         [HideInInspector] public bool estaCorriendo = false;
     }
 
-    // Definimos las 3 necesidades con sus valores fijos directamente
     public Necesidad hambre = new Necesidad { nombre = "Hambre", intervalo = 20f, escenaActivacion = "escena3" };
     public Necesidad dormir = new Necesidad { nombre = "Dormir", intervalo = 45f, escenaActivacion = "escena4" };
     public Necesidad caricias = new Necesidad { nombre = "Caricias", intervalo = 20f, escenaActivacion = "escena5" };
 
-    // Estados globales que persisten
     [HideInInspector] public bool tieneHambre = false;
     [HideInInspector] public bool quiereDormir = false;
     [HideInInspector] public bool quiereCaricias = false;
+
+    // Cola de espera para las necesidades activas (guarda el orden de llegada)
+    [HideInInspector] public List<string> colaNecesidades = new List<string>();
 
     private string escenaAnterior = "";
 
@@ -42,7 +44,6 @@ public class timerNecesidades : MonoBehaviour
 
     void Start()
     {
-        // Inicializamos los timers con sus intervalos establecidos
         hambre.timerActual = hambre.intervalo;
         dormir.timerActual = dormir.intervalo;
         caricias.timerActual = caricias.intervalo;
@@ -54,7 +55,6 @@ public class timerNecesidades : MonoBehaviour
     {
         string escenaActual = SceneManager.GetActiveScene().name;
 
-        // Si cambiamos de escena, verificamos si alguna debe empezar a contar
         if (escenaActual != escenaAnterior)
         {
             VerificarEscenaActual(escenaActual);
@@ -69,6 +69,9 @@ public class timerNecesidades : MonoBehaviour
             {
                 tieneHambre = true;
                 hambre.estaCorriendo = false;
+
+                if (!colaNecesidades.Contains("Hambre")) colaNecesidades.Add("Hambre");
+
                 Debug.Log("¡A Rufus le da hambre!");
                 AvisarUI();
             }
@@ -82,6 +85,9 @@ public class timerNecesidades : MonoBehaviour
             {
                 quiereDormir = true;
                 dormir.estaCorriendo = false;
+
+                if (!colaNecesidades.Contains("Dormir")) colaNecesidades.Add("Dormir");
+
                 Debug.Log("¡Rufus quiere dormir!");
                 AvisarUI();
             }
@@ -95,6 +101,9 @@ public class timerNecesidades : MonoBehaviour
             {
                 quiereCaricias = true;
                 caricias.estaCorriendo = false;
+
+                if (!colaNecesidades.Contains("Caricias")) colaNecesidades.Add("Caricias");
+
                 Debug.Log("¡Rufus quiere caricias!");
                 AvisarUI();
             }
@@ -103,31 +112,25 @@ public class timerNecesidades : MonoBehaviour
 
     void VerificarEscenaActual(string nombreEscena)
     {
-        // Activar Hambre en escena3
         if (nombreEscena == hambre.escenaActivacion && !tieneHambre && !hambre.estaCorriendo)
         {
             hambre.estaCorriendo = true;
-            Debug.Log("Timer de Hambre iniciado en: " + nombreEscena);
         }
 
-        // Activar Dormir en escena4
         if (nombreEscena == dormir.escenaActivacion && !quiereDormir && !dormir.estaCorriendo)
         {
             dormir.estaCorriendo = true;
-            Debug.Log("Timer de Dormir iniciado en: " + nombreEscena);
         }
 
-        // Activar Caricias en escena5
         if (nombreEscena == caricias.escenaActivacion && !quiereCaricias && !caricias.estaCorriendo)
         {
             caricias.estaCorriendo = true;
-            Debug.Log("Timer de Caricias iniciado en: " + nombreEscena);
         }
     }
 
     void AvisarUI()
     {
-        necesidadesUI uiActual = FindObjectOfType<necesidadesUI>();
+        necesidadesUI uiActual = necesidadesUI.Instance;
         if (uiActual != null)
         {
             uiActual.ActualizarVisuales();

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using System.IO.Ports;
 
 public class mimoInteraccion : MonoBehaviour
 {
@@ -12,11 +11,6 @@ public class mimoInteraccion : MonoBehaviour
 
     [Header("Configuración de Tiempo")]
     public float segundosVisible = 3f;
-
-    [Header("Configuración Arduino (Ultrasónico)")]
-    public string puertoSerial = "COM5";
-    public int baudRate = 9600;
-    private SerialPort stream;
 
     private float progresoActual = 0f;
     private float tiempoUltimoAumento = 0f;
@@ -30,46 +24,19 @@ public class mimoInteraccion : MonoBehaviour
             barraProgreso.maxValue = 1f;
             barraProgreso.value = 0f;
         }
-
-        try
-        {
-            stream = new SerialPort(puertoSerial, baudRate);
-            stream.ReadTimeout = 50;
-            stream.Open();
-        }
-        catch (System.Exception e) { }
     }
 
     void Update()
     {
-        bool activarPorTeclado = Input.GetKeyDown(KeyCode.B);
-        bool activarPorSensor = false;
+        if (ArduinoManager.Instance == null) return;
 
-        if (stream != null && stream.IsOpen)
-        {
-            try
-            {
-                if (stream.BytesToRead > 0)
-                {
-                    string dato = stream.ReadLine().Trim();
-                    if (dato.Contains("Mano") || dato.Contains("cerca"))
-                    {
-                        activarPorSensor = true;
-                    }
-                }
-            }
-            catch (System.Exception) { }
-        }
+        bool activarPorTeclado = ArduinoManager.Instance.teclaBPresionada;
+        bool activarPorSensor = ArduinoManager.Instance.sensorManoDetectado;
 
         if (activarPorTeclado || (activarPorSensor && Time.time - tiempoUltimoAumento > cooldownAumento))
         {
             AumentarProgreso();
         }
-    }
-
-    void OnApplicationQuit()
-    {
-        if (stream != null && stream.IsOpen) stream.Close();
     }
 
     void AumentarProgreso()
@@ -89,18 +56,19 @@ public class mimoInteraccion : MonoBehaviour
 
     void EjecutarAccionFinal()
     {
-        necesidadesUI ui = FindObjectOfType<necesidadesUI>();
+        necesidadesUI ui = necesidadesUI.Instance;
         if (ui != null && rufusMimo != null)
         {
             ui.MostrarSpriteTemporal(rufusMimo, segundosVisible);
         }
 
-        // Reiniciar timer de Caricias
+        // Reiniciar timer de Caricias y ponerlo a correr inmediatamente de nuevo
         if (timerNecesidades.Instance != null)
         {
             timerNecesidades.Instance.quiereCaricias = false;
+            timerNecesidades.Instance.colaNecesidades.Remove("Caricias"); // <--- Quitamos de la cola
             timerNecesidades.Instance.caricias.timerActual = timerNecesidades.Instance.caricias.intervalo;
-            timerNecesidades.Instance.caricias.estaCorriendo = false;
+            timerNecesidades.Instance.caricias.estaCorriendo = true;
         }
 
         StartCoroutine(ResetearBarra());
