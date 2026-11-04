@@ -51,7 +51,6 @@ public class popUpHitbox3 : MonoBehaviour
 
     void Update()
     {
-        // 1. SI EL POP-UP ESTÁ ABIERTO, LA TECLA 'A' AVANZA DE PASO O CIERRA
         if (popUpAbierto)
         {
             if (Input.GetKeyDown(KeyCode.A))
@@ -69,11 +68,9 @@ public class popUpHitbox3 : MonoBehaviour
             return;
         }
 
-        // Si la UI está bloqueada por animaciones, ignoramos clics
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado)
             return;
 
-        // 2. LÓGICA PARA HACER CLIC Y ABRIR EL POP-UP
         if (!Input.GetMouseButtonDown(0))
             return;
 
@@ -105,8 +102,8 @@ public class popUpHitbox3 : MonoBehaviour
 
                     popUp.SetActive(true);
                     popUpAbierto = true;
+                    timerNecesidades.HayPopupAbierto = true; // <--- PAUSA LOS TIMERS
                 }
-
                 break;
             }
         }
@@ -132,7 +129,6 @@ public class popUpHitbox3 : MonoBehaviour
         }
     }
 
-    // MÉTODO PÚBLICO: Lo podés asignar al evento OnClick() de tu botón de cierre ("X") en Unity
     public void CerrarPopup()
     {
         if (popUp != null)
@@ -141,16 +137,15 @@ public class popUpHitbox3 : MonoBehaviour
         }
 
         popUpAbierto = false;
+        timerNecesidades.HayPopupAbierto = false; // <--- REACTIVA LOS TIMERS
         indicePasoActual = 0;
 
-        // Restaura el fondo original al instante para que los hovers vuelvan a funcionar
         if (fondoNido != null && fondoOriginal != null)
         {
             fondoNido.sprite = fondoOriginal;
         }
     }
 
-    // Hover del Mouse
     private void OnMouseEnter()
     {
         if (popUpAbierto) return;

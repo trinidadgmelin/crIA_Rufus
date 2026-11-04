@@ -6,6 +6,9 @@ public class timerNecesidades : MonoBehaviour
 {
     public static timerNecesidades Instance;
 
+    // Bandera global para pausar todos los timers cuando hay un pop-up abierto
+    public static bool HayPopupAbierto = false;
+
     [System.Serializable]
     public class Necesidad
     {
@@ -66,6 +69,9 @@ public class timerNecesidades : MonoBehaviour
 
     void Update()
     {
+        // Si hay un pop-up abierto, congelamos todos los timers del juego
+        if (HayPopupAbierto) return;
+
         string escenaActual = SceneManager.GetActiveScene().name;
 
         if (escenaActual != escenaAnterior)
