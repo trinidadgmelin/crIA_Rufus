@@ -11,6 +11,9 @@ public class popUpHitbox3 : MonoBehaviour
     public TextMeshProUGUI textoUnico;
     public Image imagenUnica;
 
+    [Header("Guía para Avanzar / Salir")]
+    public TextMeshProUGUI guiaAvanzar; // Arrastrá acá el texto hijo o se busca solo
+
     [System.Serializable]
     public struct PasoPopup
     {
@@ -37,6 +40,12 @@ public class popUpHitbox3 : MonoBehaviour
         if (popUp != null)
         {
             popUp.SetActive(false);
+            // Si no lo asignaste a mano en el inspector, lo buscamos entre los hijos
+            if (guiaAvanzar == null)
+            {
+                Transform hijoGuia = popUp.transform.Find("guiaAvanzar");
+                if (hijoGuia != null) guiaAvanzar = hijoGuia.GetComponent<TextMeshProUGUI>();
+            }
         }
         else
         {
@@ -102,7 +111,7 @@ public class popUpHitbox3 : MonoBehaviour
 
                     popUp.SetActive(true);
                     popUpAbierto = true;
-                    timerNecesidades.HayPopupAbierto = true; // <--- PAUSA LOS TIMERS
+                    timerNecesidades.HayPopupAbierto = true;
                 }
                 break;
             }
@@ -127,6 +136,19 @@ public class popUpHitbox3 : MonoBehaviour
             imagenUnica.gameObject.SetActive(pasoActual.imagenPaso != null);
             imagenUnica.sprite = pasoActual.imagenPaso;
         }
+
+        // Si estamos en el último paso disponible, cambiamos el texto a "A para salir"
+        if (guiaAvanzar != null)
+        {
+            if (indicePasoActual == pasosDeEsteHitbox.Length - 1)
+            {
+                guiaAvanzar.text = "A para salir";
+            }
+            else
+            {
+                guiaAvanzar.text = "A para ver más";
+            }
+        }
     }
 
     public void CerrarPopup()
@@ -137,7 +159,7 @@ public class popUpHitbox3 : MonoBehaviour
         }
 
         popUpAbierto = false;
-        timerNecesidades.HayPopupAbierto = false; // <--- REACTIVA LOS TIMERS
+        timerNecesidades.HayPopupAbierto = false;
         indicePasoActual = 0;
 
         if (fondoNido != null && fondoOriginal != null)

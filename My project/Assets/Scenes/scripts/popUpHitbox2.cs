@@ -13,6 +13,9 @@ public class popUpHitbox2 : MonoBehaviour
     public Image imagen1;
     public Image imagen2;
 
+    [Header("Guía para Avanzar / Salir")]
+    public TextMeshProUGUI guiaAvanzar; // Arrastrá acá el texto hijo o se busca solo
+
     [System.Serializable]
     public struct GrupoContenido
     {
@@ -43,6 +46,12 @@ public class popUpHitbox2 : MonoBehaviour
         if (popUp != null)
         {
             popUp.SetActive(false);
+            // Si no lo asignaste a mano en el inspector, lo buscamos entre los hijos del pop-up
+            if (guiaAvanzar == null)
+            {
+                Transform hijoGuia = popUp.transform.Find("guiaAvanzar");
+                if (hijoGuia != null) guiaAvanzar = hijoGuia.GetComponent<TextMeshProUGUI>();
+            }
         }
         else
         {
@@ -68,7 +77,7 @@ public class popUpHitbox2 : MonoBehaviour
                 }
                 else
                 {
-                    CerrarPopup(); // <--- Usamos el método unificado para cerrar y despausar
+                    CerrarPopup();
                 }
             }
             return;
@@ -97,7 +106,7 @@ public class popUpHitbox2 : MonoBehaviour
 
                     popUp.SetActive(true);
                     popUpAbierto = true;
-                    timerNecesidades.HayPopupAbierto = true; // <--- PAUSA LOS TIMERS
+                    timerNecesidades.HayPopupAbierto = true;
                 }
                 break;
             }
@@ -117,6 +126,9 @@ public class popUpHitbox2 : MonoBehaviour
 
             if (imagen1 != null) { imagen1.gameObject.SetActive(grupo.img1 != null); imagen1.sprite = grupo.img1; }
             if (imagen2 != null) { imagen2.gameObject.SetActive(false); }
+
+            // En el primer paso, muestra para ver más
+            if (guiaAvanzar != null) guiaAvanzar.text = "A para ver más";
         }
         else
         {
@@ -125,6 +137,9 @@ public class popUpHitbox2 : MonoBehaviour
 
             if (imagen1 != null) { imagen1.gameObject.SetActive(false); }
             if (imagen2 != null) { imagen2.gameObject.SetActive(grupo.img2 != null); imagen2.sprite = grupo.img2; }
+
+            // En el último paso (paso 1 de 2), cambia a salir
+            if (guiaAvanzar != null) guiaAvanzar.text = "A para salir";
         }
     }
 
@@ -136,7 +151,7 @@ public class popUpHitbox2 : MonoBehaviour
         }
 
         popUpAbierto = false;
-        timerNecesidades.HayPopupAbierto = false; // <--- REACTIVA LOS TIMERS
+        timerNecesidades.HayPopupAbierto = false;
 
         if (gruposDeContenido != null && gruposDeContenido.Length > 0)
         {
