@@ -8,44 +8,34 @@ public class dialogos : MonoBehaviour
     [Header("UI General")]
     public TextMeshProUGUI textoDialogo;
     public GameObject fondoDialogo;
-    public Image fondoNidoImage;
+    public GameObject objetoIndicaciones;
+    public GameObject personajeDialogo;
 
-    [Header("Textos y Fondos")]
+    [Header("Imagen por Diálogo")]
+    public Image imagenDialogoUI;
+    public Sprite[] dialogSprites;
+
+    [Header("Textos")]
     [TextArea(3, 10)]
     public string[] sentences;
-    public Sprite[] backgroundSprites;
 
-    [Header("Botones e Indicaciones Condicionales")]
-    public GameObject panelTresBotones;
-    public GameObject objetoIndicaciones;
-    public int indexParaMostrarBotones = 2;
+    [Header("Cambio de Escena al Final")]
+    public string escenaDestino = "escena5"; // Nombre de la escena a la que saltará al terminar
 
     private int index = 0;
 
-    // ESTA VARIABLE ES LA CLAVE PARA COMUNICAR ESCENAS
-    public static bool saltarABotones = false;
-
     void Start()
     {
-        // Si venimos desde la otra hitbox, saltamos directo al índice de los botones
-        if (saltarABotones)
+        index = 0;
+
+        if (fondoDialogo != null)
         {
-            index = indexParaMostrarBotones;
-            saltarABotones = false; // La apagamos para que la próxima vez inicie normal
-        }
-        else
-        {
-            index = 0; // Inicio normal
+            fondoDialogo.SetActive(true);
         }
 
-        // Estado inicial de los paneles
-        if (panelTresBotones != null)
+        if (personajeDialogo != null)
         {
-            panelTresBotones.SetActive(false);
-        }
-        if (objetoIndicaciones != null)
-        {
-            objetoIndicaciones.SetActive(true);
+            personajeDialogo.SetActive(true);
         }
 
         ShowSentence();
@@ -69,13 +59,8 @@ public class dialogos : MonoBehaviour
         }
         else
         {
-            // CAMBIO: Ahora, en vez de cargar otra escena, simplemente avisa por consola 
-            // o no hace nada, evitando que el juego cambie de escena con la tecla A.
-            Debug.Log("Llegaste al final de los diálogos.");
-
-            // Si querés que al llegar al final pase algo (por ejemplo, ocultar el cuadro de diálogo), 
-            // podés descomentar la siguiente línea:
-            // if (fondoDialogo != null) fondoDialogo.SetActive(false);
+            // CAMBIO: Cuando se terminan los diálogos, cambia automáticamente de escena
+            SceneManager.LoadScene(escenaDestino);
         }
     }
 
@@ -83,28 +68,69 @@ public class dialogos : MonoBehaviour
     {
         if (sentences.Length > 0 && index < sentences.Length)
         {
-            // 1. Muestra el texto actual
-            textoDialogo.text = sentences[index];
-
-            // 2. Cambia el fondo si hay sprites asignados
-            if (fondoNidoImage != null && backgroundSprites != null && index < backgroundSprites.Length)
+            // 1. Manejo del TEXTO, FONDO y PERSONAJE (Se ocultan en el índice 3 y vuelven en el 4)
+            if (index == 3)
             {
-                if (backgroundSprites[index] != null)
-                {
-                    fondoNidoImage.sprite = backgroundSprites[index];
-                }
-            }
-
-            // 3. Controla los botones y las indicaciones según la oración actual
-            if (index == indexParaMostrarBotones)
-            {
-                if (panelTresBotones != null) panelTresBotones.SetActive(true);      // Muestra los botones
-                if (objetoIndicaciones != null) objetoIndicaciones.SetActive(false); // Oculta "indicaciones"
+                if (textoDialogo != null) textoDialogo.text = "";
+                if (fondoDialogo != null) fondoDialogo.SetActive(false);
+                if (personajeDialogo != null) personajeDialogo.SetActive(false);
             }
             else
             {
-                if (panelTresBotones != null) panelTresBotones.SetActive(false);    // Oculta los botones
-                if (objetoIndicaciones != null) objetoIndicaciones.SetActive(true);   // Muestra "indicaciones" en el resto
+                if (fondoDialogo != null) fondoDialogo.SetActive(true);
+                if (personajeDialogo != null) personajeDialogo.SetActive(true);
+
+                if (string.IsNullOrEmpty(sentences[index]))
+                {
+                    textoDialogo.text = "";
+                }
+                else
+                {
+                    textoDialogo.text = sentences[index];
+                }
+            }
+
+            // 2. Control de las INDICACIONES (Desaparece desde el segundo diálogo en adelante)
+            if (objetoIndicaciones != null)
+            {
+                if (index >= 1)
+                {
+                    objetoIndicaciones.SetActive(false);
+                }
+                else
+                {
+                    objetoIndicaciones.SetActive(true);
+                }
+            }
+
+            // 3. Manejo de la IMAGEN específica del diálogo
+            if (imagenDialogoUI != null && dialogSprites != null && index < dialogSprites.Length)
+            {
+                if (dialogSprites[index] != null)
+                {
+                    imagenDialogoUI.gameObject.SetActive(true);
+                    imagenDialogoUI.sprite = dialogSprites[index];
+
+                    // Ajuste de tamaño dinámico según el índice
+                    RectTransform rectTransform = imagenDialogoUI.GetComponent<RectTransform>();
+
+                    if (index == 2)
+                    {
+                        rectTransform.sizeDelta = new Vector2(600f, 400f);
+                    }
+                    else if (index == 3)
+                    {
+                        rectTransform.sizeDelta = new Vector2(800f, 600f);
+                    }
+                    else
+                    {
+                        rectTransform.sizeDelta = new Vector2(400f, 400f);
+                    }
+                }
+                else
+                {
+                    imagenDialogoUI.gameObject.SetActive(false);
+                }
             }
         }
     }
@@ -115,6 +141,10 @@ public class dialogos : MonoBehaviour
         if (fondoDialogo != null)
         {
             fondoDialogo.SetActive(true);
+        }
+        if (personajeDialogo != null)
+        {
+            personajeDialogo.SetActive(true);
         }
         ShowSentence();
     }

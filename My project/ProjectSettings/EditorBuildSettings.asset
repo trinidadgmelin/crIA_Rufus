@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
+    path: Assets/Scenes/inicio.unity
+    guid: bd4100179a9b21144920cd9f9c467a17
+  - enabled: 1
     path: Assets/Scenes/escena2.unity
     guid: de435a5e6dec77c4ab15b8ada20ed1db
   - enabled: 1
@@ -20,4 +23,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/escena5.unity
     guid: 3953749ab780c6240bfc5f1c3bc598f7
+  - enabled: 1
+    path: Assets/Scenes/finalEscape.unity
+    guid: 7aac624cdd2b86346acbaea07d0115fc
+  - enabled: 1
+    path: Assets/Scenes/finalFeliz.unity
+    guid: e667fbca2c8ceff46b70e1bc4b8250a8
   m_configObjects: {}

@@ -1,14 +1,15 @@
 using UnityEngine;
 using System.IO.Ports;
+using System.Threading;
 
 public class ArduinoManager : MonoBehaviour
 {
     public static ArduinoManager Instance;
 
     [Header("Configuración Arduino")]
-    public string puertoSerial = "COM5";
     public int baudRate = 9600;
-    private SerialPort stream;
+    private SerialPort puerto;
+    private bool conectado = false;
 
     // Estados leídos para este frame
     [HideInInspector] public bool sensorManoDetectado = false;
@@ -32,16 +33,47 @@ public class ArduinoManager : MonoBehaviour
 
     void Start()
     {
-        try
+        ConectarArduinoAutomatico();
+    }
+
+    void ConectarArduinoAutomatico()
+    {
+        string[] puertos = SerialPort.GetPortNames();
+
+        foreach (string nombrePuerto in puertos)
         {
-            stream = new SerialPort(puertoSerial, baudRate);
-            stream.ReadTimeout = 50;
-            stream.Open();
+            try
+            {
+                SerialPort prueba = new SerialPort(nombrePuerto, baudRate);
+                prueba.ReadTimeout = 1000;
+                prueba.WriteTimeout = 1000;
+                prueba.Open();
+
+                // Esperar el reinicio del Arduino al abrir el puerto
+                Thread.Sleep(2000);
+
+                // Comprobar si responde con el protocolo PING
+                prueba.WriteLine("PING");
+                string respuesta = prueba.ReadLine().Trim();
+
+                if (respuesta == "ARDUINO_OK")
+                {
+                    puerto = prueba;
+                    conectado = true;
+                    Debug.Log("Arduino conectado automáticamente en: " + nombrePuerto);
+                    return;
+                }
+
+                prueba.Close();
+            }
+            catch (System.Exception e)
+            {
+                // Este puerto falló o no era el Arduino, pasamos al siguiente
+                Debug.Log("No se pudo verificar " + nombrePuerto + ": " + e.Message);
+            }
         }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning("No se pudo abrir el puerto serial: " + e.Message);
-        }
+
+        Debug.LogWarning("No se encontró ningún Arduino respondiendo al PING.");
     }
 
     void Update()
@@ -52,13 +84,14 @@ public class ArduinoManager : MonoBehaviour
         sensorNidoPresionado = false;
         teclaBPresionada = Input.GetKeyDown(KeyCode.B);
 
-        if (stream != null && stream.IsOpen)
+        // Si está conectado, leemos los datos que envía el Arduino
+        if (conectado && puerto != null && puerto.IsOpen)
         {
             try
             {
-                if (stream.BytesToRead > 0)
+                if (puerto.BytesToRead > 0)
                 {
-                    string dato = stream.ReadLine().Trim();
+                    string dato = puerto.ReadLine().Trim();
 
                     // Identificamos según lo que envíe tu Arduino
                     if (dato.Contains("Mano") || dato.Contains("cerca"))
@@ -79,11 +112,20 @@ public class ArduinoManager : MonoBehaviour
         }
     }
 
+    // Método opcional por si necesitas enviar datos al Arduino desde Unity
+    public void EnviarDato(string dato)
+    {
+        if (conectado && puerto != null && puerto.IsOpen)
+        {
+            puerto.WriteLine(dato);
+        }
+    }
+
     void OnApplicationQuit()
     {
-        if (stream != null && stream.IsOpen)
+        if (puerto != null && puerto.IsOpen)
         {
-            stream.Close();
+            puerto.Close();
         }
     }
 }
