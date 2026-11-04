@@ -324,6 +324,7 @@ MonoBehaviour:
   - 
   - "\xA1Es tu turno! Explora el espacio, alimentalo, acaricialo y ayudalo a descansar.
     Cada acci\xF3n cambia su comportamiento! Nos vemos"
+  escenaDestino: escena5
 --- !u!1 &512912023
 GameObject:
   m_ObjectHideFlags: 0
@@ -1235,23 +1236,31 @@ MonoBehaviour:
     escenaActivacion: escena3
     timerActual: 0
     estaCorriendo: 0
+    tiempoMaximoEspera: 20
+    timerEsperaActual: 0
+    estaEsperando: 0
   dormir:
     nombre: Dormir
     intervalo: 45
     escenaActivacion: escena4
     timerActual: 0
     estaCorriendo: 0
+    tiempoMaximoEspera: 20
+    timerEsperaActual: 0
+    estaEsperando: 0
   caricias:
     nombre: Caricias
     intervalo: 20
     escenaActivacion: escena5
     timerActual: 0
     estaCorriendo: 0
+    tiempoMaximoEspera: 20
+    timerEsperaActual: 0
+    estaEsperando: 0
   tieneHambre: 0
   quiereDormir: 0
   quiereCaricias: 0
   colaNecesidades: []
-  tiempoExpiracion: 15
   contadorHambre: 0
   contadorDormir: 0
   contadorCaricias: 0

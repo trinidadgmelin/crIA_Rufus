@@ -15,10 +15,9 @@ public class mateInteraccion : MonoBehaviour, IPointerClickHandler
 
     void Update()
     {
-        if (ArduinoManager.Instance == null) return;
-
-        bool activarPorTeclado = ArduinoManager.Instance.teclaBPresionada;
-        bool activarPorSensor = ArduinoManager.Instance.sensorMatePresionado;
+        // Tecla E o Sensor de Arduino
+        bool activarPorTeclado = Input.GetKeyDown(KeyCode.E);
+        bool activarPorSensor = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorMatePresionado;
 
         if (activarPorTeclado || activarPorSensor)
         {
@@ -44,13 +43,9 @@ public class mateInteraccion : MonoBehaviour, IPointerClickHandler
             ui.MostrarSpriteTemporal(rufusMate, segundosVisible);
         }
 
-        // Reiniciar timer de Hambre y correr inmediatamente
         if (timerNecesidades.Instance != null)
         {
-            timerNecesidades.Instance.tieneHambre = false;
-            timerNecesidades.Instance.colaNecesidades.Remove("Hambre"); // <--- Quitamos de la cola
-            timerNecesidades.Instance.hambre.timerActual = timerNecesidades.Instance.hambre.intervalo;
-            timerNecesidades.Instance.hambre.estaCorriendo = true;
+            timerNecesidades.Instance.ResolverNecesidad("Hambre");
         }
 
         StartCoroutine(RestaurarMate());

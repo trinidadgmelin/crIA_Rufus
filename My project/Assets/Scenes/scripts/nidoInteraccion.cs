@@ -26,10 +26,9 @@ public class nidoInteraccion : MonoBehaviour, IPointerClickHandler
 
     void Update()
     {
-        if (ArduinoManager.Instance == null) return;
-
-        bool activarPorTeclado = ArduinoManager.Instance.teclaBPresionada;
-        bool activarPorSensor = ArduinoManager.Instance.sensorNidoPresionado;
+        // Tecla E o Sensor de Arduino
+        bool activarPorTeclado = Input.GetKeyDown(KeyCode.E);
+        bool activarPorSensor = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorNidoPresionado;
 
         if (activarPorTeclado || activarPorSensor)
         {
@@ -59,15 +58,10 @@ public class nidoInteraccion : MonoBehaviour, IPointerClickHandler
             fondoImage.sprite = nuevoFondoSprite;
         }
 
-        // Reiniciar timer de Dormir y correr inmediatamente
         if (timerNecesidades.Instance != null)
-            if (timerNecesidades.Instance != null)
-            {
-                timerNecesidades.Instance.quiereDormir = false;
-                timerNecesidades.Instance.colaNecesidades.Remove("Dormir"); // <--- Quitamos de la cola
-                timerNecesidades.Instance.dormir.timerActual = timerNecesidades.Instance.dormir.intervalo;
-                timerNecesidades.Instance.dormir.estaCorriendo = true;
-            }
+        {
+            timerNecesidades.Instance.ResolverNecesidad("Dormir");
+        }
 
         StartCoroutine(RestaurarEstado());
     }
