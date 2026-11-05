@@ -257,8 +257,17 @@ public class timerNecesidades : MonoBehaviour
         Debug.Log("¡Todas las necesidades completadas! Se requiere el Mimo final.");
     }
 
+    // Variable estática para saber qué necesidad provocó el escape en esta partida
+    public static string necesidadQueProvocoEscape = "";
+
     public void ActivarFinalEscape()
     {
+        // 🎯 Guardamos cuál era la necesidad que estaba en la cabeza de la cola antes de irnos
+        if (colaNecesidades.Count > 0)
+        {
+            necesidadQueProvocoEscape = colaNecesidades[0];
+        }
+
         SceneManager.LoadScene("finalEscape");
     }
 

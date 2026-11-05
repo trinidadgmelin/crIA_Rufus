@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GlobalQuitHandler : MonoBehaviour
 {
@@ -21,7 +22,13 @@ public class GlobalQuitHandler : MonoBehaviour
 
     void Update()
     {
-        // Detecta si se presiona la tecla Escape
+        // 1. Volver al inicio presionando la letra B (o también podrías usar KeyCode.B)
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            VolverAInicio();
+        }
+
+        // 2. Detecta si se presiona la tecla Escape para salir del juego
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             // Nota: Application.Quit() no cierra el editor de Unity, solo funciona en builds (ejecutables)
@@ -32,5 +39,10 @@ public class GlobalQuitHandler : MonoBehaviour
             UnityEditor.EditorApplication.isPlaying = false;
 #endif
         }
+    }
+
+    public void VolverAInicio()
+    {
+        SceneManager.LoadScene("inicio");
     }
 }
