@@ -291,6 +291,7 @@ MonoBehaviour:
   texto2: {fileID: 914220279}
   imagen1: {fileID: 1580828284}
   imagen2: {fileID: 1320834972}
+  guiaAvanzar: {fileID: 0}
   gruposDeContenido:
   - t1: "Antes el comportamiento de un NPC se programaba mediante r\xEDgidas estructuras
       de c\xF3digo  que generaba reacciones controladas en entornos muy limitados
@@ -742,6 +743,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nombreEscenaDelDialogo: escena5
+  fondoNido: {fileID: 1092570777}
+  fondoHover: {fileID: 21300000, guid: b5819a10655bb204680f5c1ae12f9a9d, type: 3}
 --- !u!1 &914220277
 GameObject:
   m_ObjectHideFlags: 0
@@ -1139,6 +1142,7 @@ GameObject:
   - component: {fileID: 1022753101}
   - component: {fileID: 1022753100}
   - component: {fileID: 1022753103}
+  - component: {fileID: 1022753104}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1236,6 +1240,19 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_MaxRayIntersections: 0
+--- !u!114 &1022753104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022753099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4694846962a9e94fac1260ecbb80777, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  indicadorVisual: {fileID: 0}
 --- !u!1 &1049886748
 GameObject:
   m_ObjectHideFlags: 0
@@ -1750,6 +1767,7 @@ MonoBehaviour:
   texto2: {fileID: 914220279}
   imagen1: {fileID: 1580828284}
   imagen2: {fileID: 1320834972}
+  guiaAvanzar: {fileID: 0}
   gruposDeContenido:
   - t1: "Los cambios sobre c\xF3mo se comporta un NPC suelen ser algo min\xFAsculo:
       c\xF3mo habla en sus di\xE1logos, por ejemplo, gracias a que el programador

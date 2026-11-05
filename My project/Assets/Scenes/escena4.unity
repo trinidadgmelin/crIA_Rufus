@@ -749,6 +749,7 @@ MonoBehaviour:
   popUp: {fileID: 944999585}
   textoUnico: {fileID: 114172429}
   imagenUnica: {fileID: 1580828284}
+  guiaAvanzar: {fileID: 0}
   pasosDeEsteHitbox:
   - textoPaso: "Antes, las mascotas respond\xEDan siempre de la misma manera y premiaban
       la repetici\xF3n de cuidados. Actualmente, la IA utiliza memoria epis\xF3dica
@@ -848,6 +849,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nombreEscenaDelDialogo: escena5
+  fondoNido: {fileID: 736078193}
+  fondoHover: {fileID: 21300000, guid: 66d27f1d888f6904ea11e720dc06c0ce, type: 3}
 --- !u!1 &892518703
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,6 +944,7 @@ MonoBehaviour:
   popUp: {fileID: 944999585}
   textoUnico: {fileID: 114172429}
   imagenUnica: {fileID: 1580828284}
+  guiaAvanzar: {fileID: 0}
   pasosDeEsteHitbox:
   - textoPaso: "Antes, las acciones activaban animaciones predeterminadas, sin considerar
       el contexto emocional o f\xEDsico del personaje. Actualmente, la IA combina
@@ -1136,6 +1140,7 @@ GameObject:
   - component: {fileID: 1022753101}
   - component: {fileID: 1022753100}
   - component: {fileID: 1022753103}
+  - component: {fileID: 1022753104}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1233,6 +1238,19 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_MaxRayIntersections: 0
+--- !u!114 &1022753104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022753099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4694846962a9e94fac1260ecbb80777, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  indicadorVisual: {fileID: 0}
 --- !u!1 &1197686522
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,6 +1344,7 @@ MonoBehaviour:
   popUp: {fileID: 944999585}
   textoUnico: {fileID: 114172429}
   imagenUnica: {fileID: 1580828284}
+  guiaAvanzar: {fileID: 0}
   pasosDeEsteHitbox:
   - textoPaso: "Antes, las necesidades de las mascotas funcionaban con temporizadores
       y valores que disminu\xEDan de forma predecible. Actualmente, la IA gestiona

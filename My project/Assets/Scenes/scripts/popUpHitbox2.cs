@@ -14,7 +14,7 @@ public class popUpHitbox2 : MonoBehaviour
     public Image imagen2;
 
     [Header("Guía para Avanzar / Salir")]
-    public TextMeshProUGUI guiaAvanzar; // Arrastrá acá el texto hijo o se busca solo
+    public TextMeshProUGUI guiaAvanzar; // Se busca solo si se deja vacío
 
     [System.Serializable]
     public struct GrupoContenido
@@ -46,7 +46,6 @@ public class popUpHitbox2 : MonoBehaviour
         if (popUp != null)
         {
             popUp.SetActive(false);
-            // Si no lo asignaste a mano en el inspector, lo buscamos entre los hijos del pop-up
             if (guiaAvanzar == null)
             {
                 Transform hijoGuia = popUp.transform.Find("guiaAvanzar");
@@ -127,7 +126,6 @@ public class popUpHitbox2 : MonoBehaviour
             if (imagen1 != null) { imagen1.gameObject.SetActive(grupo.img1 != null); imagen1.sprite = grupo.img1; }
             if (imagen2 != null) { imagen2.gameObject.SetActive(false); }
 
-            // En el primer paso, muestra para ver más
             if (guiaAvanzar != null) guiaAvanzar.text = "A para ver más";
         }
         else
@@ -138,7 +136,6 @@ public class popUpHitbox2 : MonoBehaviour
             if (imagen1 != null) { imagen1.gameObject.SetActive(false); }
             if (imagen2 != null) { imagen2.gameObject.SetActive(grupo.img2 != null); imagen2.sprite = grupo.img2; }
 
-            // En el último paso (paso 1 de 2), cambia a salir
             if (guiaAvanzar != null) guiaAvanzar.text = "A para salir";
         }
     }
@@ -171,14 +168,42 @@ public class popUpHitbox2 : MonoBehaviour
         if (popUpAbierto) return;
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
 
+        ActivarFondoHover();
+    }
+
+    private void OnMouseExit()
+    {
+        DesactivarFondoHover();
+    }
+
+    // Métodos públicos para SelectorHitboxes y Teclado
+    public void AbrirPorTeclado()
+    {
+        if (popUpAbierto) return;
+
+        if (popUp != null)
+        {
+            pasoActual = 0;
+            MostrarContenidoActual();
+
+            popUp.SetActive(true);
+            popUpAbierto = true;
+            timerNecesidades.HayPopupAbierto = true;
+        }
+    }
+
+    public void ActivarFondoHover()
+    {
+        if (popUpAbierto) return;
         if (fondoNido != null && fondoHover != null)
         {
             fondoNido.sprite = fondoHover;
         }
     }
 
-    private void OnMouseExit()
+    public void DesactivarFondoHover()
     {
+        if (popUpAbierto) return;
         if (fondoNido != null && fondoOriginal != null)
         {
             fondoNido.sprite = fondoOriginal;

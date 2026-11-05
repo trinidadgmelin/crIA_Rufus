@@ -12,7 +12,7 @@ public class popUpHitbox3 : MonoBehaviour
     public Image imagenUnica;
 
     [Header("Guía para Avanzar / Salir")]
-    public TextMeshProUGUI guiaAvanzar; // Arrastrá acá el texto hijo o se busca solo
+    public TextMeshProUGUI guiaAvanzar; // Se busca solo si se deja vacío
 
     [System.Serializable]
     public struct PasoPopup
@@ -40,7 +40,6 @@ public class popUpHitbox3 : MonoBehaviour
         if (popUp != null)
         {
             popUp.SetActive(false);
-            // Si no lo asignaste a mano en el inspector, lo buscamos entre los hijos
             if (guiaAvanzar == null)
             {
                 Transform hijoGuia = popUp.transform.Find("guiaAvanzar");
@@ -137,7 +136,6 @@ public class popUpHitbox3 : MonoBehaviour
             imagenUnica.sprite = pasoActual.imagenPaso;
         }
 
-        // Si estamos en el último paso disponible, cambiamos el texto a "A para salir"
         if (guiaAvanzar != null)
         {
             if (indicePasoActual == pasosDeEsteHitbox.Length - 1)
@@ -173,14 +171,44 @@ public class popUpHitbox3 : MonoBehaviour
         if (popUpAbierto) return;
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
 
+        ActivarFondoHover();
+    }
+
+    private void OnMouseExit()
+    {
+        DesactivarFondoHover();
+    }
+
+    // Métodos públicos para SelectorHitboxes y Teclado
+    public void AbrirPorTeclado()
+    {
+        if (popUpAbierto) return;
+
+        if (popUp != null)
+        {
+            if (pasosDeEsteHitbox == null || pasosDeEsteHitbox.Length == 0) return;
+
+            indicePasoActual = 0;
+            MostrarPasoActual();
+
+            popUp.SetActive(true);
+            popUpAbierto = true;
+            timerNecesidades.HayPopupAbierto = true;
+        }
+    }
+
+    public void ActivarFondoHover()
+    {
+        if (popUpAbierto) return;
         if (fondoNido != null && fondoHover != null)
         {
             fondoNido.sprite = fondoHover;
         }
     }
 
-    private void OnMouseExit()
+    public void DesactivarFondoHover()
     {
+        if (popUpAbierto) return;
         if (fondoNido != null && fondoOriginal != null)
         {
             fondoNido.sprite = fondoOriginal;

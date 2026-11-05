@@ -11,10 +11,16 @@ public class ArduinoManager : MonoBehaviour
     private SerialPort puerto;
     private bool conectado = false;
 
-    // Estados leídos para este frame
+    // Estados leídos para este frame (se reinician o se gestionan)
     [HideInInspector] public bool sensorManoDetectado = false;
     [HideInInspector] public bool sensorMatePresionado = false;
     [HideInInspector] public bool sensorNidoPresionado = false;
+
+    // --- NUEVOS ESTADOS PARA LOS BOTONES FÍSICOS DE NAVEGACIÓN ---
+    [HideInInspector] public bool botonIzquierdaPresionado = false;
+    [HideInInspector] public bool botonSeleccionarPresionado = false;
+    [HideInInspector] public bool botonDerechaPresionado = false;
+
     [HideInInspector] public bool teclaBPresionada = false;
 
     void Awake()
@@ -68,7 +74,6 @@ public class ArduinoManager : MonoBehaviour
             }
             catch (System.Exception e)
             {
-                // Este puerto falló o no era el Arduino, pasamos al siguiente
                 Debug.Log("No se pudo verificar " + nombrePuerto + ": " + e.Message);
             }
         }
@@ -78,10 +83,15 @@ public class ArduinoManager : MonoBehaviour
 
     void Update()
     {
-        // Reiniciar estados por frame
+        // Reiniciar estados por frame (excepto los botones físicos si necesitas que duren un frame de pulso)
         sensorManoDetectado = false;
         sensorMatePresionado = false;
         sensorNidoPresionado = false;
+
+        botonIzquierdaPresionado = false;
+        botonSeleccionarPresionado = false;
+        botonDerechaPresionado = false;
+
         teclaBPresionada = Input.GetKeyDown(KeyCode.B);
 
         // Si está conectado, leemos los datos que envía el Arduino
@@ -89,22 +99,30 @@ public class ArduinoManager : MonoBehaviour
         {
             try
             {
-                if (puerto.BytesToRead > 0)
+                while (puerto.BytesToRead > 0)
                 {
                     string dato = puerto.ReadLine().Trim();
 
-                    // Identificamos según lo que envíe tu Arduino
-                    if (dato.Contains("Mano") || dato.Contains("cerca"))
-                    {
-                        sensorManoDetectado = true;
-                    }
-                    if (dato.Contains("PRESIONADO") || dato.Contains("Pin 2"))
+                    // Identificamos según lo que envía el nuevo código de Arduino
+                    if (dato.Contains("Pin 2 PRESIONADO"))
                     {
                         sensorMatePresionado = true;
                     }
-                    if (dato.Contains("PRESIONADO") && dato.Contains("Pin 3"))
+                    if (dato.Contains("Pin 3 PRESIONADO"))
                     {
                         sensorNidoPresionado = true;
+                    }
+                    if (dato.Contains("FLECHA_IZQ"))
+                    {
+                        botonIzquierdaPresionado = true;
+                    }
+                    if (dato.Contains("BOTON_SEL"))
+                    {
+                        botonSeleccionarPresionado = true;
+                    }
+                    if (dato.Contains("FLECHA_DER"))
+                    {
+                        botonDerechaPresionado = true;
                     }
                 }
             }
@@ -112,7 +130,7 @@ public class ArduinoManager : MonoBehaviour
         }
     }
 
-    // Método opcional por si necesitas enviar datos al Arduino desde Unity
+    // Método opcional para enviar datos al Arduino desde Unity
     public void EnviarDato(string dato)
     {
         if (conectado && puerto != null && puerto.IsOpen)
