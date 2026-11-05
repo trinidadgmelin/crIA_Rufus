@@ -11,8 +11,8 @@ public class popUpHitbox3 : MonoBehaviour
     public TextMeshProUGUI textoUnico;
     public Image imagenUnica;
 
-    [Header("Guía para Avanzar / Salir")]
-    public TextMeshProUGUI guiaAvanzar;
+    [Header("Guía Visual (Imagen fija en la esquina)")]
+    public Image imagenGuia;
 
     [System.Serializable]
     public struct PasoPopup
@@ -31,8 +31,8 @@ public class popUpHitbox3 : MonoBehaviour
 
     private int indicePasoActual = 0;
     private bool popUpAbierto = false;
-    private float tiempoPermitirAccion = 0f;     // Evita doble click al avanzar
-    private float tiempoPermitirReapertura = 0f; // Evita que se reabra solo al cerrar
+    private float tiempoPermitirAccion = 0f;
+    private float tiempoPermitirReapertura = 0f;
     private Camera camara;
 
     void Start()
@@ -42,10 +42,10 @@ public class popUpHitbox3 : MonoBehaviour
         if (popUp != null)
         {
             popUp.SetActive(false);
-            if (guiaAvanzar == null)
+            if (imagenGuia == null)
             {
                 Transform hijoGuia = popUp.transform.Find("guiaAvanzar");
-                if (hijoGuia != null) guiaAvanzar = hijoGuia.GetComponent<TextMeshProUGUI>();
+                if (hijoGuia != null) imagenGuia = hijoGuia.GetComponent<Image>();
             }
         }
         else
@@ -87,15 +87,9 @@ public class popUpHitbox3 : MonoBehaviour
         }
 
         if (Time.time < tiempoPermitirReapertura) return;
-
-        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado)
-            return;
-
-        if (!Input.GetMouseButtonDown(0))
-            return;
-
-        if (camara == null)
-            return;
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
+        if (!Input.GetMouseButtonDown(0)) return;
+        if (camara == null) return;
 
         Ray ray = camara.ScreenPointToRay(Input.mousePosition);
         RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray);
@@ -114,11 +108,7 @@ public class popUpHitbox3 : MonoBehaviour
     {
         if (popUp != null)
         {
-            if (pasosDeEsteHitbox == null || pasosDeEsteHitbox.Length == 0)
-            {
-                Debug.LogWarning("No hay pasos configurados en este hitbox: " + gameObject.name);
-                return;
-            }
+            if (pasosDeEsteHitbox == null || pasosDeEsteHitbox.Length == 0) return;
 
             if (fondoNido != null && fondoOriginal != null)
             {
@@ -155,16 +145,9 @@ public class popUpHitbox3 : MonoBehaviour
             imagenUnica.sprite = pasoActual.imagenPaso;
         }
 
-        if (guiaAvanzar != null)
+        if (imagenGuia != null)
         {
-            if (indicePasoActual == pasosDeEsteHitbox.Length - 1)
-            {
-                guiaAvanzar.text = "ENTER PARA SALIR";
-            }
-            else
-            {
-                guiaAvanzar.text = "ENTER PARA VER MÁS";
-            }
+            imagenGuia.gameObject.SetActive(true);
         }
     }
 
@@ -178,8 +161,6 @@ public class popUpHitbox3 : MonoBehaviour
         popUpAbierto = false;
         timerNecesidades.HayPopupAbierto = false;
         indicePasoActual = 0;
-
-        // Protección contra auto-reapertura
         tiempoPermitirReapertura = Time.time + 0.4f;
 
         if (fondoNido != null && fondoOriginal != null)
@@ -190,41 +171,28 @@ public class popUpHitbox3 : MonoBehaviour
 
     private void OnMouseEnter()
     {
-        if (popUpAbierto) return;
-        if (Time.time < tiempoPermitirReapertura) return;
+        if (popUpAbierto || Time.time < tiempoPermitirReapertura) return;
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
-
         ActivarFondoHover();
     }
 
-    private void OnMouseExit()
-    {
-        DesactivarFondoHover();
-    }
+    private void OnMouseExit() => DesactivarFondoHover();
 
-    // Métodos públicos para SelectorHitboxes y Teclado
     public void AbrirPorTeclado()
     {
-        if (popUpAbierto) return;
-        if (Time.time < tiempoPermitirReapertura) return;
+        if (popUpAbierto || Time.time < tiempoPermitirReapertura) return;
         AbrirPopUpLogica();
     }
 
     public void ActivarFondoHover()
     {
         if (popUpAbierto) return;
-        if (fondoNido != null && fondoHover != null)
-        {
-            fondoNido.sprite = fondoHover;
-        }
+        if (fondoNido != null && fondoHover != null) fondoNido.sprite = fondoHover;
     }
 
     public void DesactivarFondoHover()
     {
         if (popUpAbierto) return;
-        if (fondoNido != null && fondoOriginal != null)
-        {
-            fondoNido.sprite = fondoOriginal;
-        }
+        if (fondoNido != null && fondoOriginal != null) fondoNido.sprite = fondoOriginal;
     }
 }
