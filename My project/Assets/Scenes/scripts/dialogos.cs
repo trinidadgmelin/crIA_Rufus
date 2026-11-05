@@ -43,7 +43,13 @@ public class dialogos : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
+        // Verificamos si se presionó la tecla A, el Enter o el botón central del Arduino
+        bool avanzarDialogo = Input.GetKeyDown(KeyCode.A) ||
+                              Input.GetKeyDown(KeyCode.Return) ||
+                              Input.GetKeyDown(KeyCode.KeypadEnter) ||
+                              (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
+
+        if (avanzarDialogo)
         {
             NextSentence();
         }

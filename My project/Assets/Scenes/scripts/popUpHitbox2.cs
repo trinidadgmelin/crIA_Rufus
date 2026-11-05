@@ -14,7 +14,7 @@ public class popUpHitbox2 : MonoBehaviour
     public Image imagen2;
 
     [Header("Guía para Avanzar / Salir")]
-    public TextMeshProUGUI guiaAvanzar; // Se busca solo si se deja vacío
+    public TextMeshProUGUI guiaAvanzar;
 
     [System.Serializable]
     public struct GrupoContenido
@@ -25,12 +25,13 @@ public class popUpHitbox2 : MonoBehaviour
         public Sprite img2;
     }
 
-    [Header("Grupos de Contenido (Se alternan al abrir, o por tecla A)")]
+    [Header("Grupos de Contenido (Exactamente 2)")]
     public GrupoContenido[] gruposDeContenido;
 
-    private int indiceGrupoActual = 0;
-    private int pasoActual = 0;
+    private int pasoActual = 0; // 0 = Paso 1, 1 = Paso 2
     private bool popUpAbierto = false;
+    private float tiempoPermitirAccion = 0f;     // Evita doble click al avanzar
+    private float tiempoPermitirReapertura = 0f; // Evita que se reabra solo al cerrar
 
     [Header("Configuración de Fondo por Hover")]
     public SpriteRenderer fondoNido;
@@ -65,14 +66,23 @@ public class popUpHitbox2 : MonoBehaviour
 
     void Update()
     {
+        // Si el pop-up está abierto, manejamos el avance o el cierre
         if (popUpAbierto)
         {
-            if (Input.GetKeyDown(KeyCode.A))
+            if (Time.time < tiempoPermitirAccion) return;
+
+            bool avanzarOAcabar = Input.GetKeyDown(KeyCode.A) ||
+                                 Input.GetKeyDown(KeyCode.Return) ||
+                                 Input.GetKeyDown(KeyCode.KeypadEnter) ||
+                                 (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
+
+            if (avanzarOAcabar)
             {
                 if (pasoActual == 0)
                 {
                     pasoActual = 1;
                     MostrarContenidoActual();
+                    tiempoPermitirAccion = Time.time + 0.2f; // Pequeña pausa para el siguiente paso
                 }
                 else
                 {
@@ -81,6 +91,9 @@ public class popUpHitbox2 : MonoBehaviour
             }
             return;
         }
+
+        // Si está cerrado, evaluamos si podemos abrirlo
+        if (Time.time < tiempoPermitirReapertura) return;
 
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado)
             return;
@@ -98,17 +111,31 @@ public class popUpHitbox2 : MonoBehaviour
         {
             if (hit.collider != null && hit.collider.gameObject == gameObject)
             {
-                if (popUp != null)
-                {
-                    pasoActual = 0;
-                    MostrarContenidoActual();
-
-                    popUp.SetActive(true);
-                    popUpAbierto = true;
-                    timerNecesidades.HayPopupAbierto = true;
-                }
+                AbrirPopUpLogica();
                 break;
             }
+        }
+    }
+
+    void AbrirPopUpLogica()
+    {
+        if (popUp != null)
+        {
+            if (gruposDeContenido == null || gruposDeContenido.Length == 0) return;
+
+            if (fondoNido != null && fondoOriginal != null)
+            {
+                fondoNido.sprite = fondoOriginal;
+            }
+
+            pasoActual = 0;
+            MostrarContenidoActual();
+
+            popUp.SetActive(true);
+            popUpAbierto = true;
+            timerNecesidades.HayPopupAbierto = true;
+
+            tiempoPermitirAccion = Time.time + 0.3f; // Bloqueo inicial al abrir
         }
     }
 
@@ -116,7 +143,8 @@ public class popUpHitbox2 : MonoBehaviour
     {
         if (gruposDeContenido == null || gruposDeContenido.Length == 0) return;
 
-        GrupoContenido grupo = gruposDeContenido[indiceGrupoActual];
+        int index = Mathf.Clamp(pasoActual, 0, gruposDeContenido.Length - 1);
+        GrupoContenido grupo = gruposDeContenido[index];
 
         if (pasoActual == 0)
         {
@@ -126,7 +154,7 @@ public class popUpHitbox2 : MonoBehaviour
             if (imagen1 != null) { imagen1.gameObject.SetActive(grupo.img1 != null); imagen1.sprite = grupo.img1; }
             if (imagen2 != null) { imagen2.gameObject.SetActive(false); }
 
-            if (guiaAvanzar != null) guiaAvanzar.text = "A para ver más";
+            if (guiaAvanzar != null) guiaAvanzar.text = "ENTER PARA VER MÁS";
         }
         else
         {
@@ -136,7 +164,7 @@ public class popUpHitbox2 : MonoBehaviour
             if (imagen1 != null) { imagen1.gameObject.SetActive(false); }
             if (imagen2 != null) { imagen2.gameObject.SetActive(grupo.img2 != null); imagen2.sprite = grupo.img2; }
 
-            if (guiaAvanzar != null) guiaAvanzar.text = "A para salir";
+            if (guiaAvanzar != null) guiaAvanzar.text = "ENTER PARA SALIR";
         }
     }
 
@@ -149,13 +177,10 @@ public class popUpHitbox2 : MonoBehaviour
 
         popUpAbierto = false;
         timerNecesidades.HayPopupAbierto = false;
-
-        if (gruposDeContenido != null && gruposDeContenido.Length > 0)
-        {
-            indiceGrupoActual = (indiceGrupoActual + 1) % gruposDeContenido.Length;
-        }
-
         pasoActual = 0;
+
+        // PROTECCIÓN CLAVE: Bloqueamos la apertura por 0.4 segundos para que el botón no lo reabra solo
+        tiempoPermitirReapertura = Time.time + 0.4f;
 
         if (fondoNido != null && fondoOriginal != null)
         {
@@ -166,6 +191,7 @@ public class popUpHitbox2 : MonoBehaviour
     private void OnMouseEnter()
     {
         if (popUpAbierto) return;
+        if (Time.time < tiempoPermitirReapertura) return;
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
 
         ActivarFondoHover();
@@ -176,20 +202,11 @@ public class popUpHitbox2 : MonoBehaviour
         DesactivarFondoHover();
     }
 
-    // Métodos públicos para SelectorHitboxes y Teclado
     public void AbrirPorTeclado()
     {
         if (popUpAbierto) return;
-
-        if (popUp != null)
-        {
-            pasoActual = 0;
-            MostrarContenidoActual();
-
-            popUp.SetActive(true);
-            popUpAbierto = true;
-            timerNecesidades.HayPopupAbierto = true;
-        }
+        if (Time.time < tiempoPermitirReapertura) return;
+        AbrirPopUpLogica();
     }
 
     public void ActivarFondoHover()

@@ -12,7 +12,7 @@ public class popUpHitbox3 : MonoBehaviour
     public Image imagenUnica;
 
     [Header("Guía para Avanzar / Salir")]
-    public TextMeshProUGUI guiaAvanzar; // Se busca solo si se deja vacío
+    public TextMeshProUGUI guiaAvanzar;
 
     [System.Serializable]
     public struct PasoPopup
@@ -31,6 +31,8 @@ public class popUpHitbox3 : MonoBehaviour
 
     private int indicePasoActual = 0;
     private bool popUpAbierto = false;
+    private float tiempoPermitirAccion = 0f;     // Evita doble click al avanzar
+    private float tiempoPermitirReapertura = 0f; // Evita que se reabra solo al cerrar
     private Camera camara;
 
     void Start()
@@ -61,12 +63,20 @@ public class popUpHitbox3 : MonoBehaviour
     {
         if (popUpAbierto)
         {
-            if (Input.GetKeyDown(KeyCode.A))
+            if (Time.time < tiempoPermitirAccion) return;
+
+            bool avanzarOAcabar = Input.GetKeyDown(KeyCode.A) ||
+                                 Input.GetKeyDown(KeyCode.Return) ||
+                                 Input.GetKeyDown(KeyCode.KeypadEnter) ||
+                                 (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
+
+            if (avanzarOAcabar)
             {
                 if (indicePasoActual < pasosDeEsteHitbox.Length - 1)
                 {
                     indicePasoActual++;
                     MostrarPasoActual();
+                    tiempoPermitirAccion = Time.time + 0.2f;
                 }
                 else
                 {
@@ -75,6 +85,8 @@ public class popUpHitbox3 : MonoBehaviour
             }
             return;
         }
+
+        if (Time.time < tiempoPermitirReapertura) return;
 
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado)
             return;
@@ -92,28 +104,35 @@ public class popUpHitbox3 : MonoBehaviour
         {
             if (hit.collider != null && hit.collider.gameObject == gameObject)
             {
-                if (popUp != null)
-                {
-                    if (pasosDeEsteHitbox == null || pasosDeEsteHitbox.Length == 0)
-                    {
-                        Debug.LogWarning("No hay pasos configurados en este hitbox: " + gameObject.name);
-                        return;
-                    }
-
-                    if (fondoNido != null && fondoOriginal != null)
-                    {
-                        fondoNido.sprite = fondoOriginal;
-                    }
-
-                    indicePasoActual = 0;
-                    MostrarPasoActual();
-
-                    popUp.SetActive(true);
-                    popUpAbierto = true;
-                    timerNecesidades.HayPopupAbierto = true;
-                }
+                AbrirPopUpLogica();
                 break;
             }
+        }
+    }
+
+    void AbrirPopUpLogica()
+    {
+        if (popUp != null)
+        {
+            if (pasosDeEsteHitbox == null || pasosDeEsteHitbox.Length == 0)
+            {
+                Debug.LogWarning("No hay pasos configurados en este hitbox: " + gameObject.name);
+                return;
+            }
+
+            if (fondoNido != null && fondoOriginal != null)
+            {
+                fondoNido.sprite = fondoOriginal;
+            }
+
+            indicePasoActual = 0;
+            MostrarPasoActual();
+
+            popUp.SetActive(true);
+            popUpAbierto = true;
+            timerNecesidades.HayPopupAbierto = true;
+
+            tiempoPermitirAccion = Time.time + 0.3f;
         }
     }
 
@@ -140,11 +159,11 @@ public class popUpHitbox3 : MonoBehaviour
         {
             if (indicePasoActual == pasosDeEsteHitbox.Length - 1)
             {
-                guiaAvanzar.text = "A para salir";
+                guiaAvanzar.text = "ENTER PARA SALIR";
             }
             else
             {
-                guiaAvanzar.text = "A para ver más";
+                guiaAvanzar.text = "ENTER PARA VER MÁS";
             }
         }
     }
@@ -160,6 +179,9 @@ public class popUpHitbox3 : MonoBehaviour
         timerNecesidades.HayPopupAbierto = false;
         indicePasoActual = 0;
 
+        // Protección contra auto-reapertura
+        tiempoPermitirReapertura = Time.time + 0.4f;
+
         if (fondoNido != null && fondoOriginal != null)
         {
             fondoNido.sprite = fondoOriginal;
@@ -169,6 +191,7 @@ public class popUpHitbox3 : MonoBehaviour
     private void OnMouseEnter()
     {
         if (popUpAbierto) return;
+        if (Time.time < tiempoPermitirReapertura) return;
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
 
         ActivarFondoHover();
@@ -183,18 +206,8 @@ public class popUpHitbox3 : MonoBehaviour
     public void AbrirPorTeclado()
     {
         if (popUpAbierto) return;
-
-        if (popUp != null)
-        {
-            if (pasosDeEsteHitbox == null || pasosDeEsteHitbox.Length == 0) return;
-
-            indicePasoActual = 0;
-            MostrarPasoActual();
-
-            popUp.SetActive(true);
-            popUpAbierto = true;
-            timerNecesidades.HayPopupAbierto = true;
-        }
+        if (Time.time < tiempoPermitirReapertura) return;
+        AbrirPopUpLogica();
     }
 
     public void ActivarFondoHover()
