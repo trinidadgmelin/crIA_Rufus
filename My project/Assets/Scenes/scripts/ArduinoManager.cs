@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO.Ports;
 using System.Threading;
+using UnityEngine.SceneManagement;
 
 public class ArduinoManager : MonoBehaviour
 {
@@ -11,12 +12,12 @@ public class ArduinoManager : MonoBehaviour
     private SerialPort puerto;
     private bool conectado = false;
 
-    // Estados leídos para este frame (se reinician o se gestionan)
+    // Estados leídos
     [HideInInspector] public bool sensorManoDetectado = false;
     [HideInInspector] public bool sensorMatePresionado = false;
     [HideInInspector] public bool sensorNidoPresionado = false;
 
-    // --- NUEVOS ESTADOS PARA LOS BOTONES FÍSICOS DE NAVEGACIÓN ---
+    // Estados para los botones físicos de navegación
     [HideInInspector] public bool botonIzquierdaPresionado = false;
     [HideInInspector] public bool botonSeleccionarPresionado = false;
     [HideInInspector] public bool botonDerechaPresionado = false;
@@ -25,6 +26,8 @@ public class ArduinoManager : MonoBehaviour
 
     void Awake()
     {
+        Debug.Log("Arduino creado en escena: " + SceneManager.GetActiveScene().name);
+
         if (Instance == null)
         {
             Instance = this;
@@ -51,22 +54,21 @@ public class ArduinoManager : MonoBehaviour
             try
             {
                 SerialPort prueba = new SerialPort(nombrePuerto, baudRate);
-                prueba.ReadTimeout = 1000;
-                prueba.WriteTimeout = 1000;
+                prueba.ReadTimeout = 50;
+                prueba.WriteTimeout = 50;
                 prueba.Open();
 
-                // Esperar el reinicio del Arduino al abrir el puerto
-                Thread.Sleep(2000);
+                Thread.Sleep(2000); // Esperar reinicio del Arduino
 
-                // Comprobar si responde con el protocolo PING
                 prueba.WriteLine("PING");
                 string respuesta = prueba.ReadLine().Trim();
 
                 if (respuesta == "ARDUINO_OK")
                 {
                     puerto = prueba;
+                    puerto.ReadTimeout = 20;
                     conectado = true;
-                    Debug.Log("Arduino conectado automáticamente en: " + nombrePuerto);
+                    Debug.Log("<color=green>¡Arduino conectado exitosamente en: " + nombrePuerto + "!</color>");
                     return;
                 }
 
@@ -83,18 +85,15 @@ public class ArduinoManager : MonoBehaviour
 
     void Update()
     {
-        // Reiniciar estados por frame (excepto los botones físicos si necesitas que duren un frame de pulso)
+        // Reiniciar estados por frame (los botones tipo pulso se limpian acá)
         sensorManoDetectado = false;
-        sensorMatePresionado = false;
-        sensorNidoPresionado = false;
-
         botonIzquierdaPresionado = false;
         botonSeleccionarPresionado = false;
         botonDerechaPresionado = false;
 
         teclaBPresionada = Input.GetKeyDown(KeyCode.B);
 
-        // Si está conectado, leemos los datos que envía el Arduino
+        // Si está conectado, leemos todos los bytes acumulados en el puerto serie
         if (conectado && puerto != null && puerto.IsOpen)
         {
             try
@@ -103,26 +102,51 @@ public class ArduinoManager : MonoBehaviour
                 {
                     string dato = puerto.ReadLine().Trim();
 
-                    // Identificamos según lo que envía el nuevo código de Arduino
-                    if (dato.Contains("Pin 2 PRESIONADO"))
+                    // Identificamos y registramos cada estado con Debug.Log usando tus etiquetas exactas
+                    if (dato == "PIN_2_ACTIVADO")
                     {
                         sensorMatePresionado = true;
+                        Debug.Log("<color=cyan>[Arduino] Pin 2 ACTIVADO (Mate)</color>");
                     }
-                    if (dato.Contains("Pin 3 PRESIONADO"))
+                    else if (dato == "PIN_2_DESCONECTADO")
+                    {
+                        sensorMatePresionado = false;
+                        Debug.Log("<color=cyan>[Arduino] Pin 2 DESCONECTADO (Mate)</color>");
+                    }
+
+                    if (dato == "PIN_3_ACTIVADO")
                     {
                         sensorNidoPresionado = true;
+                        Debug.Log("<color=magenta>[Arduino] Pin 3 ACTIVADO (Nido)</color>");
                     }
-                    if (dato.Contains("FLECHA_IZQ"))
+                    else if (dato == "PIN_3_DESCONECTADO")
+                    {
+                        sensorNidoPresionado = false;
+                        Debug.Log("<color=magenta>[Arduino] Pin 3 DESCONECTADO (Nido)</color>");
+                    }
+
+                    if (dato == "MANO_CERCA")
+                    {
+                        sensorManoDetectado = true;
+                        Debug.Log("<color=yellow>[Arduino] Ultrasonico: Mano cerca detectada (3-20 cm)</color>");
+                    }
+
+                    if (dato == "FLECHA_IZQ")
                     {
                         botonIzquierdaPresionado = true;
+                        Debug.Log("<color=orange>[Arduino] Botón físico: FLECHA_IZQ presionado</color>");
                     }
-                    if (dato.Contains("BOTON_SEL"))
+
+                    if (dato == "BOTON_SEL")
                     {
                         botonSeleccionarPresionado = true;
+                        Debug.Log("<color=orange>[Arduino] Botón físico: BOTON_SEL presionado</color>");
                     }
-                    if (dato.Contains("FLECHA_DER"))
+
+                    if (dato == "FLECHA_DER")
                     {
                         botonDerechaPresionado = true;
+                        Debug.Log("<color=orange>[Arduino] Botón físico: FLECHA_DER presionado</color>");
                     }
                 }
             }
@@ -130,12 +154,12 @@ public class ArduinoManager : MonoBehaviour
         }
     }
 
-    // Método opcional para enviar datos al Arduino desde Unity
     public void EnviarDato(string dato)
     {
         if (conectado && puerto != null && puerto.IsOpen)
         {
             puerto.WriteLine(dato);
+            Debug.Log("[Arduino] Dato enviado: " + dato);
         }
     }
 
@@ -144,6 +168,7 @@ public class ArduinoManager : MonoBehaviour
         if (puerto != null && puerto.IsOpen)
         {
             puerto.Close();
+            Debug.Log("[Arduino] Puerto serie cerrado correctamente.");
         }
     }
 }

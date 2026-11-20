@@ -6,7 +6,6 @@ public class timerNecesidades : MonoBehaviour
 {
     public static timerNecesidades Instance;
 
-    // Bandera global para pausar todos los timers cuando hay un pop-up abierto
     public static bool HayPopupAbierto = false;
 
     [System.Serializable]
@@ -14,12 +13,12 @@ public class timerNecesidades : MonoBehaviour
     {
         public string nombre;
         public float intervalo;
-        public string escenaActivacion;
+        public string escenaActivacion; // 🎯 Escena donde empieza a correr
         [HideInInspector] public float timerActual;
         [HideInInspector] public bool estaCorriendo = false;
 
         [Header("Tiempo Límite de Urgencia")]
-        public float tiempoMaximoEspera = 15f; // Tiempo antes de ir a finalEscape
+        public float tiempoMaximoEspera = 15f;
         [HideInInspector] public float timerEsperaActual = 0f;
         [HideInInspector] public bool estaEsperando = false;
     }
@@ -28,19 +27,16 @@ public class timerNecesidades : MonoBehaviour
     public Necesidad dormir = new Necesidad { nombre = "Dormir", intervalo = 45f, escenaActivacion = "escena4", tiempoMaximoEspera = 15f };
     public Necesidad caricias = new Necesidad { nombre = "Caricias", intervalo = 20f, escenaActivacion = "escena5", tiempoMaximoEspera = 15f };
 
-    // Banderas originales que usan tus scripts de interacción
     [HideInInspector] public bool tieneHambre = false;
     [HideInInspector] public bool quiereDormir = false;
     [HideInInspector] public bool quiereCaricias = false;
 
-    // Cola de espera para las necesidades activas
     [HideInInspector] public List<string> colaNecesidades = new List<string>();
 
-    // Contadores de cuántas veces se resolvió cada necesidad
     [HideInInspector] public int contadorHambre = 0;
     [HideInInspector] public int contadorDormir = 0;
     [HideInInspector] public int contadorCaricias = 0;
-    public int metaPorNecesidad = 3; // Cantidad requerida para el final feliz
+    public int metaPorNecesidad = 3;
 
     private bool esperandoMimoFinal = false;
     private string escenaAnterior = "";
@@ -69,11 +65,12 @@ public class timerNecesidades : MonoBehaviour
 
     void Update()
     {
-        // Si hay un pop-up abierto, congelamos todos los timers del juego
         if (HayPopupAbierto) return;
 
         string escenaActual = SceneManager.GetActiveScene().name;
+        if (escenaActual.Contains("final")) return;
 
+        // Si cambiamos de escena, verificamos si corresponde activar algún timer
         if (escenaActual != escenaAnterior)
         {
             VerificarEscenaActual(escenaActual);
@@ -134,7 +131,7 @@ public class timerNecesidades : MonoBehaviour
             }
         }
 
-        // --- GESTIÓN DE TIEMPO DE ESPERA / URGENCIA DE LA NECESIDAD EN CURSO ---
+        // --- GESTIÓN DE TIEMPO DE ESPERA ---
         if (colaNecesidades.Count > 0 && !esperandoMimoFinal)
         {
             string necesidadEnFoco = colaNecesidades[0];
@@ -165,17 +162,18 @@ public class timerNecesidades : MonoBehaviour
     {
         if (esperandoMimoFinal) return;
 
-        if (nombreEscena == hambre.escenaActivacion && !tieneHambre && !hambre.estaCorriendo)
+        // Activa el timer de hambre solo si estás en su escena asignada y no está ya resuelto/corriendo
+        if (nombreEscena == hambre.escenaActivacion && !tieneHambre && !hambre.estaCorriendo && !hambre.estaEsperando)
         {
             hambre.estaCorriendo = true;
         }
 
-        if (nombreEscena == dormir.escenaActivacion && !quiereDormir && !dormir.estaCorriendo)
+        if (nombreEscena == dormir.escenaActivacion && !quiereDormir && !dormir.estaCorriendo && !dormir.estaEsperando)
         {
             dormir.estaCorriendo = true;
         }
 
-        if (nombreEscena == caricias.escenaActivacion && !quiereCaricias && !caricias.estaCorriendo)
+        if (nombreEscena == caricias.escenaActivacion && !quiereCaricias && !caricias.estaCorriendo && !caricias.estaEsperando)
         {
             caricias.estaCorriendo = true;
         }
@@ -189,7 +187,6 @@ public class timerNecesidades : MonoBehaviour
         }
     }
 
-    // Método que llaman tus interacciones cuando el jugador resuelve una necesidad
     public void ResolverNecesidad(string nombreNecesidad)
     {
         if (esperandoMimoFinal)
@@ -211,7 +208,8 @@ public class timerNecesidades : MonoBehaviour
             {
                 nec.estaEsperando = false;
                 nec.timerActual = nec.intervalo;
-                nec.estaCorriendo = true;
+                // Al resolverse, dejamos que vuelva a correr según la escena en la que esté el jugador
+                nec.estaCorriendo = false;
             }
 
             if (nombreNecesidad == "Hambre")
@@ -257,17 +255,14 @@ public class timerNecesidades : MonoBehaviour
         Debug.Log("¡Todas las necesidades completadas! Se requiere el Mimo final.");
     }
 
-    // Variable estática para saber qué necesidad provocó el escape en esta partida
     public static string necesidadQueProvocoEscape = "";
 
     public void ActivarFinalEscape()
     {
-        // 🎯 Guardamos cuál era la necesidad que estaba en la cabeza de la cola antes de irnos
         if (colaNecesidades.Count > 0)
         {
             necesidadQueProvocoEscape = colaNecesidades[0];
         }
-
         SceneManager.LoadScene("finalEscape");
     }
 

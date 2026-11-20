@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
 
-public class controlCinematique : MonoBehaviour // Mantén el nombre de tu clase original (controlCinematica)
+public class controlCinematique : MonoBehaviour
 {
     [Header("Referencias")]
     public VideoPlayer videoPlayer; // Arrastra aquí tu Video Player
@@ -22,29 +22,25 @@ public class controlCinematique : MonoBehaviour // Mantén el nombre de tu clase 
 
     void Update()
     {
-        // Verificamos si se presiona Enter en el teclado O el botón central del Arduino
-        bool accionSeleccionar = Input.GetKeyDown(KeyCode.Return) ||
-                                 Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                                 (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
+        // Verificamos únicamente si se presiona Enter en el teclado
+        bool accionEnter = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
 
-        if (accionSeleccionar)
+        if (accionEnter)
         {
-            // Si el canvas con el botón de "Reproducir" sigue activo, lo accionamos
+            // 1. Si el canvas con el botón de "Reproducir" sigue activo, lo accionamos
             if (canvasConBoton != null && canvasConBoton.activeInHierarchy)
             {
                 ReproducirCinematica();
             }
-            // Opcional: Si querés que el botón central también sirva para saltar/cortar el video antes de que termine, podés descomentar la línea de abajo:
-            /*
+            // 2. Si el video se está reproduciendo, al presionar Enter se salta y cambia de escena
             else if (videoPlayer != null && videoPlayer.isPlaying)
             {
                 AlTerminarVideo(videoPlayer);
             }
-            */
         }
     }
 
-    // Método que llamarás desde el botón de la UI o se disparará por teclado/Arduino
+    // Método que llamarás desde el botón de la UI o se disparará por teclado
     public void ReproducirCinematica()
     {
         // Ocultamos el canvas/botón para que no estorben durante el video
@@ -61,9 +57,15 @@ public class controlCinematique : MonoBehaviour // Mantén el nombre de tu clase 
         }
     }
 
-    // Este método se ejecuta automáticamente cuando el video llega al final
+    // Este método se ejecuta cuando el video termina o cuando se presiona Enter para saltarlo
     void AlTerminarVideo(VideoPlayer vp)
     {
+        // Desuscribimos el evento para prevenir llamadas duplicadas
+        if (videoPlayer != null)
+        {
+            videoPlayer.loopPointReached -= AlTerminarVideo;
+        }
+
         SceneManager.LoadScene(nombreEscenaDestino);
     }
 }

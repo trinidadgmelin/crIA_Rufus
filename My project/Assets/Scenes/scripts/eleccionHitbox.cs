@@ -1,13 +1,13 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
 public class HitboxOtraEscena : MonoBehaviour, IPointerClickHandler
 {
-    [Header("Configuración")]
+    [Header("ConfiguraciÃ³n")]
     public string nombreEscenaDelDialogo;
 
-    [Header("Configuración de Fondo por Hover (Opcional)")]
+    [Header("ConfiguraciÃ³n de Fondo por Hover (Opcional)")]
     public SpriteRenderer fondoNido;
     public Sprite fondoHover;
     private Sprite fondoOriginal;
@@ -22,11 +22,14 @@ public class HitboxOtraEscena : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
         CambiarEscena();
     }
 
     public void CambiarEscena()
     {
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
+
         if (!string.IsNullOrEmpty(nombreEscenaDelDialogo))
         {
             Debug.Log("Cambiando a la escena: " + nombreEscenaDelDialogo);
@@ -34,18 +37,22 @@ public class HitboxOtraEscena : MonoBehaviour, IPointerClickHandler
         }
         else
         {
-            Debug.LogWarning("El nombre de la escena está vacío en el inspector.");
+            Debug.LogWarning("El nombre de la escena estÃ¡ vacÃ­o en el inspector.");
         }
     }
 
-    // Métodos públicos para SelectorHitboxes y Teclado
+    // MÃ©todos pÃºblicos para SelectorHitboxes y Teclado
     public void AbrirPorTeclado()
     {
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
         CambiarEscena();
     }
 
     public void ActivarFondoHover()
     {
+        // ðŸŽ¯ Si la UI estÃ¡ bloqueada (mostrando sprite temporal), ignoramos el hover por completo
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
+
         if (fondoNido != null && fondoHover != null)
         {
             fondoNido.sprite = fondoHover;
@@ -62,6 +69,7 @@ public class HitboxOtraEscena : MonoBehaviour, IPointerClickHandler
 
     private void OnMouseEnter()
     {
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
         ActivarFondoHover();
     }
 

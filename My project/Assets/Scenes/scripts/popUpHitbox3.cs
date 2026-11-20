@@ -66,9 +66,9 @@ public class popUpHitbox3 : MonoBehaviour
             if (Time.time < tiempoPermitirAccion) return;
 
             bool avanzarOAcabar = Input.GetKeyDown(KeyCode.A) ||
-                                 Input.GetKeyDown(KeyCode.Return) ||
-                                 Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                                 (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
+                               Input.GetKeyDown(KeyCode.Return) ||
+                               Input.GetKeyDown(KeyCode.KeypadEnter) ||
+                               (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
 
             if (avanzarOAcabar)
             {
@@ -106,6 +106,8 @@ public class popUpHitbox3 : MonoBehaviour
 
     void AbrirPopUpLogica()
     {
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
+
         if (popUp != null)
         {
             if (pasosDeEsteHitbox == null || pasosDeEsteHitbox.Length == 0) return;
@@ -176,17 +178,22 @@ public class popUpHitbox3 : MonoBehaviour
         ActivarFondoHover();
     }
 
-    private void OnMouseExit() => DesactivarFondoHover();
+    private void OnMouseExit()
+    {
+        DesactivarFondoHover();
+    }
 
     public void AbrirPorTeclado()
     {
         if (popUpAbierto || Time.time < tiempoPermitirReapertura) return;
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
         AbrirPopUpLogica();
     }
 
     public void ActivarFondoHover()
     {
         if (popUpAbierto) return;
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
         if (fondoNido != null && fondoHover != null) fondoNido.sprite = fondoHover;
     }
 

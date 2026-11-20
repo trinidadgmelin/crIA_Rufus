@@ -13,8 +13,9 @@ public class popUpHitbox2 : MonoBehaviour
     public Image imagen1;
     public Image imagen2;
 
-    [Header("Guía Visual (Imagen fija en la esquina)")]
-    public Image imagenGuia;          // Una única imagen guía fija
+    [Header("Guías Visuales")]
+    public Image imagenGuia;          // Guía original (ej. Enter / Continuar / Salir)
+    public Image imagenBarra;         // Nueva imagen de la barra
 
     [System.Serializable]
     public struct GrupoContenido
@@ -23,9 +24,17 @@ public class popUpHitbox2 : MonoBehaviour
         [TextArea(2, 5)] public string t2;
         public Sprite img1;
         public Sprite img2;
+
+        [Header("Guía Principal por Paso")]
+        public Sprite guiaPaso0;      // Guía para el paso 0
+        public Sprite guiaPaso1;      // Guía para el paso 1
+
+        [Header("Nuevas Guías (Barra) por Paso")]
+        public Sprite barra0;         // Barra para el paso 0
+        public Sprite barra1;         // Barra para el paso 1
     }
 
-    [Header("Grupos de Contenido (Exactamente 2)")]
+    [Header("Grupos de Contenido (Exactamente 1)")]
     public GrupoContenido[] gruposDeContenido;
 
     private int pasoActual = 0;
@@ -71,9 +80,9 @@ public class popUpHitbox2 : MonoBehaviour
             if (Time.time < tiempoPermitirAccion) return;
 
             bool avanzarOAcabar = Input.GetKeyDown(KeyCode.A) ||
-                                 Input.GetKeyDown(KeyCode.Return) ||
-                                 Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                                 (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
+                               Input.GetKeyDown(KeyCode.Return) ||
+                               Input.GetKeyDown(KeyCode.KeypadEnter) ||
+                               (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
 
             if (avanzarOAcabar)
             {
@@ -111,6 +120,8 @@ public class popUpHitbox2 : MonoBehaviour
 
     void AbrirPopUpLogica()
     {
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
+
         if (popUp != null)
         {
             if (gruposDeContenido == null || gruposDeContenido.Length == 0) return;
@@ -135,8 +146,7 @@ public class popUpHitbox2 : MonoBehaviour
     {
         if (gruposDeContenido == null || gruposDeContenido.Length == 0) return;
 
-        int index = Mathf.Clamp(pasoActual, 0, gruposDeContenido.Length - 1);
-        GrupoContenido grupo = gruposDeContenido[index];
+        GrupoContenido grupo = gruposDeContenido[0];
 
         if (pasoActual == 0)
         {
@@ -145,6 +155,18 @@ public class popUpHitbox2 : MonoBehaviour
 
             if (imagen1 != null) { imagen1.gameObject.SetActive(grupo.img1 != null); imagen1.sprite = grupo.img1; }
             if (imagen2 != null) { imagen2.gameObject.SetActive(false); }
+
+            if (imagenGuia != null)
+            {
+                imagenGuia.gameObject.SetActive(grupo.guiaPaso0 != null);
+                imagenGuia.sprite = grupo.guiaPaso0;
+            }
+
+            if (imagenBarra != null)
+            {
+                imagenBarra.gameObject.SetActive(grupo.barra0 != null);
+                imagenBarra.sprite = grupo.barra0;
+            }
         }
         else
         {
@@ -153,11 +175,18 @@ public class popUpHitbox2 : MonoBehaviour
 
             if (imagen1 != null) { imagen1.gameObject.SetActive(false); }
             if (imagen2 != null) { imagen2.gameObject.SetActive(grupo.img2 != null); imagen2.sprite = grupo.img2; }
-        }
 
-        if (imagenGuia != null)
-        {
-            imagenGuia.gameObject.SetActive(true);
+            if (imagenGuia != null)
+            {
+                imagenGuia.gameObject.SetActive(grupo.guiaPaso1 != null);
+                imagenGuia.sprite = grupo.guiaPaso1;
+            }
+
+            if (imagenBarra != null)
+            {
+                imagenBarra.gameObject.SetActive(grupo.barra1 != null);
+                imagenBarra.sprite = grupo.barra1;
+            }
         }
     }
 
@@ -186,17 +215,22 @@ public class popUpHitbox2 : MonoBehaviour
         ActivarFondoHover();
     }
 
-    private void OnMouseExit() => DesactivarFondoHover();
+    private void OnMouseExit()
+    {
+        DesactivarFondoHover();
+    }
 
     public void AbrirPorTeclado()
     {
         if (popUpAbierto || Time.time < tiempoPermitirReapertura) return;
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
         AbrirPopUpLogica();
     }
 
     public void ActivarFondoHover()
     {
         if (popUpAbierto) return;
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
         if (fondoNido != null && fondoHover != null) fondoNido.sprite = fondoHover;
     }
 

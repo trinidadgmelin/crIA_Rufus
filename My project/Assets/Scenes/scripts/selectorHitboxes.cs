@@ -1,13 +1,14 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 
 public class SelectorHitboxes : MonoBehaviour
 {
-    [Header("Indicador Visual de Selección (Opcional)")]
+    [Header("Indicador Visual de SelecciÃ³n (Opcional)")]
     public GameObject indicadorVisual;
 
     private List<Transform> hitboxesOrdenadas = new List<Transform>();
     private int indiceSeleccionado = 0;
+    private bool haySeleccionActiva = false;
     private Camera camara;
 
     void Start()
@@ -30,16 +31,30 @@ public class SelectorHitboxes : MonoBehaviour
         foreach (var h in scriptPop3) todasLasHitboxes.Add(h.transform);
         foreach (var h in scriptOtraEscena) todasLasHitboxes.Add(h.transform);
 
-        // Ordenamos de izquierda a derecha por posición X
+        // Ordenamos de izquierda a derecha por posiciÃ³n X
         todasLasHitboxes.Sort((a, b) => a.position.x.CompareTo(b.position.x));
 
         hitboxesOrdenadas = todasLasHitboxes;
         indiceSeleccionado = 0;
-        ActualizarSeleccionVisual();
+
+        haySeleccionActiva = false;
+        DesactivarTodosLosHovers();
+        if (indicadorVisual != null) indicadorVisual.SetActive(false);
     }
 
     void Update()
     {
+        // ðŸŽ¯ BLOQUEO TOTAL: Si hay popup abierto o Rufus estÃ¡ mostrando un sprite temporal, 
+        // anulamos completamente las hitboxes, los hovers y la navegaciÃ³n por teclado/Arduino.
+        if (timerNecesidades.HayPopupAbierto) return;
+
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado)
+        {
+            if (indicadorVisual != null) indicadorVisual.SetActive(false);
+            DesactivarTodosLosHovers();
+            return;
+        }
+
         if (hitboxesOrdenadas == null || hitboxesOrdenadas.Count == 0) return;
 
         hitboxesOrdenadas.RemoveAll(h => h == null || !h.gameObject.activeInHierarchy);
@@ -49,27 +64,37 @@ public class SelectorHitboxes : MonoBehaviour
 
         int indiceAnterior = indiceSeleccionado;
 
-        // --- 1. NAVEGACIÓN (Teclado O Arduino) ---
+        // --- 1. NAVEGACIÃ“N (Teclado O Arduino) ---
         bool moverDerecha = Input.GetKeyDown(KeyCode.RightArrow) || (ArduinoManager.Instance != null && ArduinoManager.Instance.botonDerechaPresionado);
         bool moverIzquierda = Input.GetKeyDown(KeyCode.LeftArrow) || (ArduinoManager.Instance != null && ArduinoManager.Instance.botonIzquierdaPresionado);
 
         if (moverDerecha)
         {
-            indiceSeleccionado = (indiceSeleccionado + 1) % hitboxesOrdenadas.Count;
+            if (!haySeleccionActiva)
+            {
+                haySeleccionActiva = true;
+            }
+            else
+            {
+                indiceSeleccionado = (indiceSeleccionado + 1) % hitboxesOrdenadas.Count;
+            }
+            ActualizarSeleccionVisual();
         }
         else if (moverIzquierda)
         {
-            indiceSeleccionado = (indiceSeleccionado - 1 + hitboxesOrdenadas.Count) % hitboxesOrdenadas.Count;
-        }
-
-        // Si cambió la selección con las flechas, actualizamos los fondos y la posición visual
-        if (indiceAnterior != indiceSeleccionado)
-        {
+            if (!haySeleccionActiva)
+            {
+                haySeleccionActiva = true;
+            }
+            else
+            {
+                indiceSeleccionado = (indiceSeleccionado - 1 + hitboxesOrdenadas.Count) % hitboxesOrdenadas.Count;
+            }
             ActualizarSeleccionVisual();
         }
 
-        // --- 2. ACCIÓN / SELECCIÓN (Enter O Botón Central del Arduino) ---
-        bool accionar = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado);
+        // --- 2. ACCIÃ“N / SELECCIÃ“N (Enter O BotÃ³n Central del Arduino) ---
+        bool accionar = haySeleccionActiva && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || (ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado));
 
         if (accionar)
         {
@@ -79,23 +104,9 @@ public class SelectorHitboxes : MonoBehaviour
 
     void ActualizarSeleccionVisual()
     {
-        // 1. Primero desactivamos el hover en TODAS las hitboxes para evitar conflictos de sobreescritura
-        foreach (Transform t in hitboxesOrdenadas)
-        {
-            if (t == null) continue;
+        DesactivarTodosLosHovers();
 
-            var p2 = t.GetComponent<popUpHitbox2>();
-            if (p2 != null) p2.DesactivarFondoHover();
-
-            var p3 = t.GetComponent<popUpHitbox3>();
-            if (p3 != null) p3.DesactivarFondoHover();
-
-            var otraEscena = t.GetComponent<HitboxOtraEscena>();
-            if (otraEscena != null) otraEscena.DesactivarFondoHover();
-        }
-
-        // 2. Luego activamos el hover ÚNICAMENTE en la hitbox que está seleccionada actualmente
-        if (hitboxesOrdenadas.Count > 0)
+        if (haySeleccionActiva && hitboxesOrdenadas.Count > 0)
         {
             Transform tActual = hitboxesOrdenadas[indiceSeleccionado];
             if (tActual != null)
@@ -110,17 +121,39 @@ public class SelectorHitboxes : MonoBehaviour
                 if (otraEscena != null) otraEscena.ActivarFondoHover();
             }
 
-            // Posicionar indicador visual si lo tenés asignado
             if (indicadorVisual != null)
             {
                 indicadorVisual.SetActive(true);
-                indicadorVisual.transform.position = tActual.position;
+                indicadorVisual.transform.position = hitboxesOrdenadas[indiceSeleccionado].position;
             }
+        }
+        else
+        {
+            if (indicadorVisual != null) indicadorVisual.SetActive(false);
+        }
+    }
+
+    void DesactivarTodosLosHovers()
+    {
+        foreach (Transform t in hitboxesOrdenadas)
+        {
+            if (t == null) continue;
+
+            var p2 = t.GetComponent<popUpHitbox2>();
+            if (p2 != null) p2.DesactivarFondoHover();
+
+            var p3 = t.GetComponent<popUpHitbox3>();
+            if (p3 != null) p3.DesactivarFondoHover();
+
+            var otraEscena = t.GetComponent<HitboxOtraEscena>();
+            if (otraEscena != null) otraEscena.DesactivarFondoHover();
         }
     }
 
     void SimularClickEnHitboxSeleccionada()
     {
+        if (!haySeleccionActiva) return;
+
         Transform hitboxActual = hitboxesOrdenadas[indiceSeleccionado];
 
         popUpHitbox2 pop2 = hitboxActual.GetComponent<popUpHitbox2>();

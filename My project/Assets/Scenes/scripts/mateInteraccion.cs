@@ -1,63 +1,26 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using System.Collections;
 
-public class mateInteraccion : MonoBehaviour, IPointerClickHandler
+public class mateInteraccion : MonoBehaviour
 {
     [Header("Referencias")]
     public GameObject mate;
-    public SpriteRenderer rufusFeliz;
-    public Sprite rufusMate;
 
     [Header("Configuración de Tiempo")]
     public float segundosVisible = 3f;
 
-    void Update()
+    // Este método ahora puede ser llamado de forma segura cuando se interactúa con el mate
+    public void ActivarMateLocal()
     {
-        // Tecla E o Sensor de Arduino
-        bool activarPorTeclado = Input.GetKeyDown(KeyCode.E);
-        bool activarPorSensor = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorMatePresionado;
-
-        if (activarPorTeclado || activarPorSensor)
-        {
-            EjecutarAccion();
-        }
+        StartCoroutine(RutinaMateLocal());
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    IEnumerator RutinaMateLocal()
     {
-        EjecutarAccion();
-    }
+        if (mate != null) mate.SetActive(false);
 
-    void EjecutarAccion()
-    {
-        if (mate != null)
-        {
-            mate.SetActive(false);
-        }
-
-        necesidadesUI ui = necesidadesUI.Instance;
-        if (ui != null && rufusMate != null)
-        {
-            ui.MostrarSpriteTemporal(rufusMate, segundosVisible);
-        }
-
-        if (timerNecesidades.Instance != null)
-        {
-            timerNecesidades.Instance.ResolverNecesidad("Hambre");
-        }
-
-        StartCoroutine(RestaurarMate());
-    }
-
-    IEnumerator RestaurarMate()
-    {
         yield return new WaitForSeconds(segundosVisible);
 
-        if (mate != null)
-        {
-            mate.SetActive(true);
-        }
+        if (mate != null) mate.SetActive(true);
     }
 }

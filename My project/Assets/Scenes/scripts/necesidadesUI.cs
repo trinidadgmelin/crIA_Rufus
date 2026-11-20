@@ -7,8 +7,8 @@ public class necesidadesUI : MonoBehaviour
 {
     public static necesidadesUI Instance;
 
-    // Propiedad pública que indica si la UI está bloqueada (mostrando sprite temporal)
-    public bool EstaBloqueado { get; private set; } = false;
+    // Propiedad pública que lee directamente la bandera de bloqueo para los hitboxes
+    public bool EstaBloqueado => bloquearActualizacion;
 
     [Header("Sprite por Defecto de Rufus")]
     public SpriteRenderer rufusSpriteRenderer;
@@ -55,7 +55,6 @@ public class necesidadesUI : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 🎯 Si cargamos una escena de final, no tocamos nada para dejar libres los gráficos de derrota/victoria
         if (scene.name.Contains("final")) return;
 
         ReconectarReferencias();
@@ -73,7 +72,6 @@ public class necesidadesUI : MonoBehaviour
 
     void Update()
     {
-        // 🎯 Si estamos en una escena de final, el script descansa y no pisa los gráficos de la UI
         string escenaActual = SceneManager.GetActiveScene().name;
         if (escenaActual.Contains("final")) return;
 
@@ -112,6 +110,14 @@ public class necesidadesUI : MonoBehaviour
 
     public void ActualizarVisuales()
     {
+        if (bloquearActualizacion)
+        {
+            if (hambreAd != null) hambreAd.SetActive(false);
+            if (mimoAd != null) mimoAd.SetActive(false);
+            if (sueñoAd != null) sueñoAd.SetActive(false);
+            return;
+        }
+
         timerNecesidades elTimer = timerNecesidades.Instance;
         if (elTimer == null) return;
 
@@ -204,5 +210,11 @@ public class necesidadesUI : MonoBehaviour
 
         bloquearActualizacion = false;
         ActualizarVisuales();
+    }
+
+    // 🎯 Método agregado para permitir el bloqueo externo (ej. Rutina de Dormir Global)
+    public void ForzarBloqueo(bool estado)
+    {
+        bloquearActualizacion = estado;
     }
 }

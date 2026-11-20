@@ -7,22 +7,24 @@ public class GlobalQuitHandler : MonoBehaviour
 
     void Awake()
     {
-        // Patrón Singleton para asegurar que solo exista un objeto de estos y persista
+        // Patrón Singleton persistente
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject); // Evita que se destruya al cambiar de escena
+            DontDestroyOnLoad(gameObject); // Debe estar en la raíz de la jerarquía
+            Debug.Log("[GlobalQuitHandler] Instancia creada y marcada como DontDestroyOnLoad.");
         }
         else
         {
-            Destroy(gameObject); // Si ya hay uno en otra escena, destruye el duplicado
+            Debug.LogWarning("[GlobalQuitHandler] Duplicado detectado en la escena " + SceneManager.GetActiveScene().name + ". Destruyendo.");
+            Destroy(gameObject);
             return;
         }
     }
 
     void Update()
     {
-        // 1. Volver al inicio presionando la letra B (o también podrías usar KeyCode.B)
+        // 1. Volver al inicio presionando la letra B
         if (Input.GetKeyDown(KeyCode.B))
         {
             VolverAInicio();
@@ -31,11 +33,9 @@ public class GlobalQuitHandler : MonoBehaviour
         // 2. Detecta si se presiona la tecla Escape para salir del juego
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Nota: Application.Quit() no cierra el editor de Unity, solo funciona en builds (ejecutables)
             Application.Quit();
 
 #if UNITY_EDITOR
-            // Esto es solo para que también se detenga el juego mientras estás probando en el Editor
             UnityEditor.EditorApplication.isPlaying = false;
 #endif
         }
