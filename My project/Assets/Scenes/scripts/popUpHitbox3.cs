@@ -194,12 +194,15 @@ public class popUpHitbox3 : MonoBehaviour
     {
         if (popUpAbierto) return;
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
+        if (ControladorGlobalInteracciones.Instance != null && ControladorGlobalInteracciones.Instance.EstaDurmiendo) return;
         if (fondoNido != null && fondoHover != null) fondoNido.sprite = fondoHover;
     }
 
     public void DesactivarFondoHover()
     {
         if (popUpAbierto) return;
+        if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
+        if (ControladorGlobalInteracciones.Instance != null && ControladorGlobalInteracciones.Instance.EstaDurmiendo) return;
         if (fondoNido != null && fondoOriginal != null) fondoNido.sprite = fondoOriginal;
     }
 }

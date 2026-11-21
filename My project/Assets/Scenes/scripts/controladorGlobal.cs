@@ -6,6 +6,8 @@ public class ControladorGlobalInteracciones : MonoBehaviour
 {
     public static ControladorGlobalInteracciones Instance;
 
+    public bool EstaDurmiendo => durmiendoEnCurso;
+
     [Header("Sprites Temporales de Interacción")]
     public Sprite rufusMate;       // Tecla 1 / Sensor Mate (Hambre)
     public Sprite rufusMimo;       // Tecla 2 / Sensor Mano (Caricias)
@@ -18,6 +20,7 @@ public class ControladorGlobalInteracciones : MonoBehaviour
     public float segundosVisible = 3f;
 
     private bool durmiendoEnCurso = false;
+    private float tiempoFinSpriteTemporal = 0f;
 
     void Awake()
     {
@@ -60,8 +63,9 @@ public class ControladorGlobalInteracciones : MonoBehaviour
             EjecutarAccionGlobal("Caricias", rufusMimo);
         }
 
-        // 3. ACCIÓN: DORMIR (Nido) -> Tecla 3 o Sensor Pin 3
-        if (usarDormirTeclado || usarDormirSensor)
+        // 3. ACCIÓN: DORMIR (Nido) -> Tecla 3 o Sensor Pin 3 (bloqueado mientras haya un sprite temporal activo)
+        bool spriteTemporalActivo = Time.time < tiempoFinSpriteTemporal;
+        if (!spriteTemporalActivo && (usarDormirTeclado || usarDormirSensor))
         {
             StartCoroutine(RutinaDormirGlobal());
         }
@@ -69,6 +73,8 @@ public class ControladorGlobalInteracciones : MonoBehaviour
 
     void EjecutarAccionGlobal(string necesidad, Sprite spriteTemporal)
     {
+        tiempoFinSpriteTemporal = Time.time + segundosVisible;
+
         if (necesidadesUI.Instance != null && spriteTemporal != null)
         {
             necesidadesUI.Instance.MostrarSpriteTemporal(spriteTemporal, segundosVisible);
@@ -86,7 +92,7 @@ public class ControladorGlobalInteracciones : MonoBehaviour
     {
         durmiendoEnCurso = true;
 
-        // 🎯 1. Forzamos el bloqueo de la UI y hitboxes inmediatamente al iniciar la acción
+        // 1. Forzamos el bloqueo de la UI y hitboxes inmediatamente al iniciar la acción
         if (necesidadesUI.Instance != null)
         {
             necesidadesUI.Instance.ForzarBloqueo(true);
@@ -111,30 +117,37 @@ public class ControladorGlobalInteracciones : MonoBehaviour
         GameObject objetoRufus = GameObject.Find("Rufus");
         GameObject sueñoAd = GameObject.Find("sueñoAd");
 
-        SpriteRenderer fondoImage = BuscarFondoEscena();
-        Sprite fondoOriginal = (fondoImage != null) ? fondoImage.sprite : null;
+        SpriteRenderer fondoSR = BuscarFondoEscena();
+        Sprite fondoOriginal = (fondoSR != null) ? fondoSR.sprite : null;
 
         if (objetoRufus != null) objetoRufus.SetActive(false);
         if (sueñoAd != null) sueñoAd.SetActive(false);
 
-        if (fondoImage != null && fondoDormidoSprite != null)
+        // Mantenemos el sprite dormido durante todo el tiempo visible
+        float tiempoRestante = segundosVisible;
+        while (tiempoRestante > 0f)
         {
-            fondoImage.sprite = fondoDormidoSprite;
-        }
+            if (fondoSR != null && fondoDormidoSprite != null && fondoSR.sprite != fondoDormidoSprite)
+            {
+                fondoSR.sprite = fondoDormidoSprite;
+            }
+            if (objetoRufus != null && objetoRufus.activeSelf) objetoRufus.SetActive(false);
+            if (sueñoAd != null && sueñoAd.activeSelf) sueñoAd.SetActive(false);
 
-        // Esperamos el tiempo visible con todo completamente bloqueado
-        yield return new WaitForSeconds(segundosVisible);
+            tiempoRestante -= Time.deltaTime;
+            yield return null;
+        }
 
         if (SceneManager.GetActiveScene().name == nombreEscenaDormir)
         {
             if (objetoRufus != null) objetoRufus.SetActive(true);
-            if (fondoImage != null && fondoOriginal != null)
+            if (fondoSR != null && fondoOriginal != null)
             {
-                fondoImage.sprite = fondoOriginal;
+                fondoSR.sprite = fondoOriginal;
             }
         }
 
-        // 🎯 2. Desbloqueamos la UI y las hitboxes al finalizar la animación
+        // 2. Desbloqueamos la UI y las hitboxes al finalizar la animación
         if (necesidadesUI.Instance != null)
         {
             necesidadesUI.Instance.ForzarBloqueo(false);
@@ -145,29 +158,12 @@ public class ControladorGlobalInteracciones : MonoBehaviour
 
     SpriteRenderer BuscarFondoEscena()
     {
-        string[] nombresPosibles = { "Fondo", "fondo", "Background", "Escenario", "Habitacion" };
-        foreach (string nombre in nombresPosibles)
+        GameObject fondoObj = GameObject.Find("fondoHab");
+        if (fondoObj != null)
         {
-            GameObject obj = GameObject.Find(nombre);
-            if (obj != null && obj.GetComponent<SpriteRenderer>() != null)
-            {
-                return obj.GetComponent<SpriteRenderer>();
-            }
+            return fondoObj.GetComponent<SpriteRenderer>();
         }
 
-        SpriteRenderer[] renderers = FindObjectsOfType<SpriteRenderer>();
-        SpriteRenderer masAtras = null;
-        int menorOrden = int.MaxValue;
-
-        foreach (SpriteRenderer sr in renderers)
-        {
-            if (sr.gameObject.name != "Rufus" && sr.sortingOrder < menorOrden)
-            {
-                menorOrden = sr.sortingOrder;
-                masAtras = sr;
-            }
-        }
-
-        return masAtras;
+        return null;
     }
 }

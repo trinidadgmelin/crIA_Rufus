@@ -13,7 +13,6 @@ public class controlCinematique : MonoBehaviour
 
     void Start()
     {
-        // Nos suscribimos al evento que se dispara cuando el video termina
         if (videoPlayer != null)
         {
             videoPlayer.loopPointReached += AlTerminarVideo;
@@ -22,17 +21,17 @@ public class controlCinematique : MonoBehaviour
 
     void Update()
     {
-        // Verificamos únicamente si se presiona Enter en el teclado
         bool accionEnter = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
+        bool accionBotonSel = ArduinoManager.Instance != null && ArduinoManager.Instance.botonSeleccionarPresionado;
 
-        if (accionEnter)
+        if (accionEnter || accionBotonSel)
         {
             // 1. Si el canvas con el botón de "Reproducir" sigue activo, lo accionamos
             if (canvasConBoton != null && canvasConBoton.activeInHierarchy)
             {
                 ReproducirCinematica();
             }
-            // 2. Si el video se está reproduciendo, al presionar Enter se salta y cambia de escena
+            // 2. Si el video se está reproduciendo, al presionar Enter o BOTON_SEL se salta y cambia de escena
             else if (videoPlayer != null && videoPlayer.isPlaying)
             {
                 AlTerminarVideo(videoPlayer);
@@ -40,16 +39,13 @@ public class controlCinematique : MonoBehaviour
         }
     }
 
-    // Método que llamarás desde el botón de la UI o se disparará por teclado
     public void ReproducirCinematica()
     {
-        // Ocultamos el canvas/botón para que no estorben durante el video
         if (canvasConBoton != null)
         {
             canvasConBoton.SetActive(false);
         }
 
-        // Activamos y reproducimos el video
         if (videoPlayer != null)
         {
             videoPlayer.gameObject.SetActive(true);
@@ -57,10 +53,8 @@ public class controlCinematique : MonoBehaviour
         }
     }
 
-    // Este método se ejecuta cuando el video termina o cuando se presiona Enter para saltarlo
     void AlTerminarVideo(VideoPlayer vp)
     {
-        // Desuscribimos el evento para prevenir llamadas duplicadas
         if (videoPlayer != null)
         {
             videoPlayer.loopPointReached -= AlTerminarVideo;
