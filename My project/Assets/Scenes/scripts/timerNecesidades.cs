@@ -7,13 +7,16 @@ public class timerNecesidades : MonoBehaviour
     public static timerNecesidades Instance;
 
     public static bool HayPopupAbierto = false;
+    public static bool PausarTimersPorEvento = false;
+
+    private static int indicacionesActivasCount = 0;
 
     [System.Serializable]
     public class Necesidad
     {
         public string nombre;
         public float intervalo;
-        public string escenaActivacion; // 🎯 Escena donde empieza a correr
+        public string escenaActivacion;
         [HideInInspector] public float timerActual;
         [HideInInspector] public bool estaCorriendo = false;
 
@@ -65,12 +68,11 @@ public class timerNecesidades : MonoBehaviour
 
     void Update()
     {
-        if (HayPopupAbierto) return;
+        if (HayPopupAbierto || PausarTimersPorEvento) return;
 
         string escenaActual = SceneManager.GetActiveScene().name;
         if (escenaActual.Contains("final")) return;
 
-        // Si cambiamos de escena, verificamos si corresponde activar algún timer
         if (escenaActual != escenaAnterior)
         {
             VerificarEscenaActual(escenaActual);
@@ -150,6 +152,33 @@ public class timerNecesidades : MonoBehaviour
         }
     }
 
+    public static void RegistrarIndicacionActiva(bool activa)
+    {
+        if (activa)
+        {
+            indicacionesActivasCount++;
+        }
+        else
+        {
+            indicacionesActivasCount = Mathf.Max(0, indicacionesActivasCount - 1);
+        }
+
+        EvaluarBloqueoYPausaGlobal();
+    }
+
+    public static void EvaluarBloqueoYPausaGlobal()
+    {
+        bool estaDurmiendo = ControladorGlobalInteracciones.Instance != null && ControladorGlobalInteracciones.Instance.EstaDurmiendo;
+        bool debeBloquearYPausar = estaDurmiendo || (indicacionesActivasCount > 0);
+
+        PausarTimersPorEvento = debeBloquearYPausar;
+
+        if (necesidadesUI.Instance != null)
+        {
+            necesidadesUI.Instance.ForzarBloqueo(debeBloquearYPausar);
+        }
+    }
+
     Necesidad ObtenerNecesidadPorNombre(string nombre)
     {
         if (nombre == "Hambre") return hambre;
@@ -162,7 +191,6 @@ public class timerNecesidades : MonoBehaviour
     {
         if (esperandoMimoFinal) return;
 
-        // Activa el timer de hambre solo si estás en su escena asignada y no está ya resuelto/corriendo
         if (nombreEscena == hambre.escenaActivacion && !tieneHambre && !hambre.estaCorriendo && !hambre.estaEsperando)
         {
             hambre.estaCorriendo = true;
@@ -208,7 +236,6 @@ public class timerNecesidades : MonoBehaviour
             {
                 nec.estaEsperando = false;
                 nec.timerActual = nec.intervalo;
-                // Al resolverse, dejamos que vuelva a correr según la escena en la que esté el jugador
                 nec.estaCorriendo = false;
             }
 

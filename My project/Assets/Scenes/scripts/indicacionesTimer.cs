@@ -5,46 +5,69 @@ using UnityEngine;
 public class indicacionesTimer : MonoBehaviour
 {
     [Header("Configuración del Timer")]
-    public float tiempoDeEspera = 10f; // Segundos antes de empezar a desaparecer
-    public float duracionFade = 1f;    // Lo que tarda en desvanecerse por completo
+    public float tiempoDeEspera = 10f;
+    public float duracionFade = 1f;
 
     [Header("Identificador Único")]
-    [Tooltip("Pon un nombre diferente en cada escena u objeto para que lleven cuentas separadas.")]
-    public string idIndicacion = "Indicaciones_Nivel1";
+    public string idIndicacion = "Indicaciones_Nivel3";
 
-    // Diccionario estático que guarda qué IDs ya terminaron de verse en esta sesión
     private static Dictionary<string, bool> estadosVistas = new Dictionary<string, bool>();
 
     private CanvasGroup canvasGroup;
+    private bool registroActivo = false;
 
     void Awake()
     {
-        // 1. Verificamos si este ID específico ya terminó de verse en la sesión actual
+        Debug.Log($"[Indicaciones] Awake en {gameObject.name} | id={idIndicacion}");
+
         if (estadosVistas.ContainsKey(idIndicacion) && estadosVistas[idIndicacion])
         {
+            Debug.Log("[Indicaciones] Ya estaba marcada como vista. Se desactiva.");
             gameObject.SetActive(false);
             return;
         }
 
-        // 2. Buscamos el CanvasGroup, y si no lo tiene, se lo agregamos
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
+
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
     void Start()
     {
+        Debug.Log($"[Indicaciones] Start -> EstaDurmiendo = {ControladorGlobalInteracciones.Instance?.EstaDurmiendo}");
         StartCoroutine(TimerYFadeOut());
     }
 
     IEnumerator TimerYFadeOut()
     {
-        // 1. Espera el tiempo principal
+        // Espera un frame tras cargar la escena para asegurar estados actualizados
+        yield return null;
+
+        // Si llegamos por la rutina de dormir (tecla 3 / nido), espera a que
+        // termine el tiempo configurado del sprite/estado de dormir
+        while (ControladorGlobalInteracciones.Instance != null &&
+               ControladorGlobalInteracciones.Instance.EstaDurmiendo)
+        {
+            yield return null;
+        }
+
+        // Mostrar indicaciones
+        canvasGroup.alpha = 1f;
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
+
+        MarcarIndicacionActiva(true);
+
+        // Tiempo visible configurado
         yield return new WaitForSeconds(tiempoDeEspera);
 
-        // 2. Realiza el desvanecimiento progresivo (Fade Out)
+        // Fade Out
         float tiempoTranscurrido = 0f;
         while (tiempoTranscurrido < duracionFade)
         {
@@ -53,13 +76,45 @@ public class indicacionesTimer : MonoBehaviour
             yield return null;
         }
 
-        // Nos aseguramos de que quede totalmente invisible al final
         canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
 
-        // 3. 🎯 Guardamos que ESTE ID en específico ya terminó de verse
         estadosVistas[idIndicacion] = true;
+        MarcarIndicacionActiva(false);
 
-        // 4. Desactiva el objeto completo
         gameObject.SetActive(false);
+    }
+
+    public static void ResetearIndicacion(string id)
+    {
+        if (estadosVistas.ContainsKey(id))
+        {
+            estadosVistas[id] = false;
+        }
+    }
+
+    private void MarcarIndicacionActiva(bool activa)
+    {
+        if (activa && !registroActivo)
+        {
+            registroActivo = true;
+            timerNecesidades.RegistrarIndicacionActiva(true);
+        }
+        else if (!activa && registroActivo)
+        {
+            registroActivo = false;
+            timerNecesidades.RegistrarIndicacionActiva(false);
+        }
+    }
+
+    void OnDisable()
+    {
+        MarcarIndicacionActiva(false);
+    }
+
+    void OnDestroy()
+    {
+        MarcarIndicacionActiva(false);
     }
 }

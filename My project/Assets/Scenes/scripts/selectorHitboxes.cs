@@ -65,6 +65,8 @@ public class SelectorHitboxes : MonoBehaviour
         int indiceAnterior = indiceSeleccionado;
 
         // --- 1. NAVEGACIÓN (Teclado O Arduino) ---
+        // Derecha: empieza en el extremo derecho y siempre avanza hacia la derecha (+1)
+        // Izquierda: siempre avanza hacia la izquierda (-1)
         bool moverDerecha = Input.GetKeyDown(KeyCode.RightArrow) || (ArduinoManager.Instance != null && ArduinoManager.Instance.botonDerechaPresionado);
         bool moverIzquierda = Input.GetKeyDown(KeyCode.LeftArrow) || (ArduinoManager.Instance != null && ArduinoManager.Instance.botonIzquierdaPresionado);
 
@@ -73,6 +75,7 @@ public class SelectorHitboxes : MonoBehaviour
             if (!haySeleccionActiva)
             {
                 haySeleccionActiva = true;
+                indiceSeleccionado = hitboxesOrdenadas.Count - 1;
             }
             else
             {
@@ -85,6 +88,7 @@ public class SelectorHitboxes : MonoBehaviour
             if (!haySeleccionActiva)
             {
                 haySeleccionActiva = true;
+                indiceSeleccionado = 0;
             }
             else
             {

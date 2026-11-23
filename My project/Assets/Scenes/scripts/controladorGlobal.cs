@@ -37,11 +37,9 @@ public class ControladorGlobalInteracciones : MonoBehaviour
 
     void Update()
     {
-        // Si hay un pop-up abierto, la UI está bloqueada o ya estamos durmiendo, ignoramos inputs
         if (timerNecesidades.HayPopupAbierto || durmiendoEnCurso) return;
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
 
-        // Detección por Teclado (1, 2, 3) y Sensores de Arduino
         bool usarMateTeclado = Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1);
         bool usarMateSensor = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorMatePresionado;
 
@@ -51,19 +49,16 @@ public class ControladorGlobalInteracciones : MonoBehaviour
         bool usarDormirTeclado = Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3);
         bool usarDormirSensor = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorNidoPresionado;
 
-        // 1. ACCIÓN: HAMBRE (Mate) -> Tecla 1 o Sensor Pin 2
         if (usarMateTeclado || usarMateSensor)
         {
             EjecutarAccionGlobal("Hambre", rufusMate);
         }
 
-        // 2. ACCIÓN: CARICIAS (Mimo) -> Tecla 2 o Sensor Mano
         if (usarMimoTeclado || usarMimoSensor)
         {
             EjecutarAccionGlobal("Caricias", rufusMimo);
         }
 
-        // 3. ACCIÓN: DORMIR (Nido) -> Tecla 3 o Sensor Pin 3 (bloqueado mientras haya un sprite temporal activo)
         bool spriteTemporalActivo = Time.time < tiempoFinSpriteTemporal;
         if (!spriteTemporalActivo && (usarDormirTeclado || usarDormirSensor))
         {
@@ -91,19 +86,13 @@ public class ControladorGlobalInteracciones : MonoBehaviour
     IEnumerator RutinaDormirGlobal()
     {
         durmiendoEnCurso = true;
-
-        // 1. Forzamos el bloqueo de la UI y hitboxes inmediatamente al iniciar la acción
-        if (necesidadesUI.Instance != null)
-        {
-            necesidadesUI.Instance.ForzarBloqueo(true);
-        }
+        timerNecesidades.EvaluarBloqueoYPausaGlobal();
 
         if (timerNecesidades.Instance != null)
         {
             timerNecesidades.Instance.ResolverNecesidad("Dormir");
         }
 
-        // Si no estamos en la escena de dormir, la cargamos de forma asíncrona
         if (SceneManager.GetActiveScene().name != nombreEscenaDormir)
         {
             AsyncOperation carga = SceneManager.LoadSceneAsync(nombreEscenaDormir);
@@ -111,7 +100,7 @@ public class ControladorGlobalInteracciones : MonoBehaviour
             {
                 yield return null;
             }
-            yield return null; // Esperamos un frame extra para inicializar referencias
+            yield return null;
         }
 
         GameObject objetoRufus = GameObject.Find("Rufus");
@@ -123,7 +112,6 @@ public class ControladorGlobalInteracciones : MonoBehaviour
         if (objetoRufus != null) objetoRufus.SetActive(false);
         if (sueñoAd != null) sueñoAd.SetActive(false);
 
-        // Mantenemos el sprite dormido durante todo el tiempo visible
         float tiempoRestante = segundosVisible;
         while (tiempoRestante > 0f)
         {
@@ -147,13 +135,8 @@ public class ControladorGlobalInteracciones : MonoBehaviour
             }
         }
 
-        // 2. Desbloqueamos la UI y las hitboxes al finalizar la animación
-        if (necesidadesUI.Instance != null)
-        {
-            necesidadesUI.Instance.ForzarBloqueo(false);
-        }
-
         durmiendoEnCurso = false;
+        timerNecesidades.EvaluarBloqueoYPausaGlobal();
     }
 
     SpriteRenderer BuscarFondoEscena()
