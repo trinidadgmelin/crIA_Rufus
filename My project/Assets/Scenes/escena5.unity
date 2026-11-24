@@ -814,6 +814,7 @@ MonoBehaviour:
   rufusMimo: {fileID: 21300000, guid: 8eacc6f1ad16b5d4f8ef2ba11880d0d9, type: 3}
   nombreEscenaDormir: escena4
   fondoDormidoSprite: {fileID: 21300000, guid: 7691213ab5db17a4ba3413ee53c706c8, type: 3}
+  segundosDormir: 8
   segundosVisible: 3
 --- !u!4 &1111723520
 Transform:
@@ -1564,13 +1565,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1942385504}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1670015379}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 125, y: 0.0000076294}

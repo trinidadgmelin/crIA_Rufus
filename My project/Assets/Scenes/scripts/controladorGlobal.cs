@@ -15,12 +15,15 @@ public class ControladorGlobalInteracciones : MonoBehaviour
     [Header("Configuración Específica de Dormir")]
     public string nombreEscenaDormir = "escena4";
     public Sprite fondoDormidoSprite; // Sprite del fondo con Rufus durmiendo en el nido
+    public float segundosDormir = 5f;
 
     [Header("Configuración de Tiempo")]
     public float segundosVisible = 3f;
 
     private bool durmiendoEnCurso = false;
     private float tiempoFinSpriteTemporal = 0f;
+    private bool mateEstabaPresionado = false;
+    private bool nidoEstabaPresionado = false;
 
     void Awake()
     {
@@ -37,17 +40,23 @@ public class ControladorGlobalInteracciones : MonoBehaviour
 
     void Update()
     {
+        bool estadoMateActual = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorMatePresionado;
+        bool usarMateSensor = estadoMateActual && !mateEstabaPresionado;
+        mateEstabaPresionado = estadoMateActual;
+
+        bool estadoNidoActual = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorNidoPresionado;
+        bool usarNidoSensor = estadoNidoActual && !nidoEstabaPresionado;
+        nidoEstabaPresionado = estadoNidoActual;
+
         if (timerNecesidades.HayPopupAbierto || durmiendoEnCurso) return;
         if (necesidadesUI.Instance != null && necesidadesUI.Instance.EstaBloqueado) return;
 
         bool usarMateTeclado = Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1);
-        bool usarMateSensor = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorMatePresionado;
 
         bool usarMimoTeclado = Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2);
         bool usarMimoSensor = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorManoDetectado;
 
         bool usarDormirTeclado = Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3);
-        bool usarDormirSensor = (ArduinoManager.Instance != null) && ArduinoManager.Instance.sensorNidoPresionado;
 
         if (usarMateTeclado || usarMateSensor)
         {
@@ -60,7 +69,7 @@ public class ControladorGlobalInteracciones : MonoBehaviour
         }
 
         bool spriteTemporalActivo = Time.time < tiempoFinSpriteTemporal;
-        if (!spriteTemporalActivo && (usarDormirTeclado || usarDormirSensor))
+        if (!spriteTemporalActivo && (usarDormirTeclado || usarNidoSensor))
         {
             StartCoroutine(RutinaDormirGlobal());
         }
@@ -112,7 +121,7 @@ public class ControladorGlobalInteracciones : MonoBehaviour
         if (objetoRufus != null) objetoRufus.SetActive(false);
         if (sueñoAd != null) sueñoAd.SetActive(false);
 
-        float tiempoRestante = segundosVisible;
+        float tiempoRestante = segundosDormir;
         while (tiempoRestante > 0f)
         {
             if (fondoSR != null && fondoDormidoSprite != null && fondoSR.sprite != fondoDormidoSprite)
